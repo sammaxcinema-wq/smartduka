@@ -361,17 +361,170 @@ body::after{
   align-items: center;
   gap: 8px;
 }
+
+/* ========== AUTHENTICATION STYLES (FIXED) ========== */
+#auth-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 200;
+  background: rgba(5,8,7,0.96);
+  backdrop-filter: blur(20px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: opacity 0.4s ease, visibility 0.4s;
+  opacity: 1;
+  visibility: visible;
+}
+#auth-overlay.auth-hide {
+  opacity: 0;
+  visibility: hidden;
+}
+.auth-screen {
+  max-width: 340px;
+  width: 90%;
+  background: rgba(12,19,16,0.85);
+  border: 1px solid rgba(255,255,255,0.08);
+  border-radius: 32px;
+  padding: 32px 24px 40px;
+  box-shadow: 0 20px 40px rgba(0,0,0,0.5), 0 0 0 1px rgba(200,136,58,0.1);
+  text-align: center;
+}
+.auth-brand-eye {
+  font-size: 9px;
+  letter-spacing: 4px;
+  color: var(--muted);
+  text-transform: uppercase;
+  margin-bottom: 12px;
+}
+.auth-brand-name {
+  font-family: var(--serif);
+  font-size: 36px;
+  font-weight: 400;
+  color: var(--text);
+  margin-bottom: 28px;
+}
+.auth-brand-name em {
+  color: var(--gold);
+  font-style: italic;
+}
+.auth-tabs {
+  display: flex;
+  gap: 8px;
+  background: rgba(0,0,0,0.3);
+  border-radius: 60px;
+  padding: 4px;
+  margin-bottom: 28px;
+}
+.auth-tab {
+  flex: 1;
+  background: transparent;
+  border: none;
+  padding: 10px 0;
+  font-family: var(--sans);
+  font-weight: 600;
+  font-size: 14px;
+  color: var(--muted2);
+  border-radius: 60px;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+.auth-tab.active {
+  background: rgba(200,136,58,0.15);
+  color: var(--gold2);
+  box-shadow: inset 0 0 0 1px rgba(200,136,58,0.3);
+}
+.auth-input-group {
+  margin-bottom: 18px;
+  text-align: left;
+}
+.auth-input-group label {
+  display: block;
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 1.5px;
+  color: var(--muted);
+  text-transform: uppercase;
+  margin-bottom: 6px;
+}
+.auth-input-group input {
+  width: 100%;
+  background: rgba(255,255,255,0.05);
+  border: 1px solid rgba(255,255,255,0.1);
+  border-radius: 14px;
+  padding: 14px 16px;
+  color: var(--text);
+  font-size: 15px;
+  font-family: var(--sans);
+  outline: none;
+  transition: border 0.2s;
+}
+.auth-input-group input:focus {
+  border-color: var(--gold);
+}
+.auth-error {
+  background: rgba(229,69,98,0.12);
+  border: 1px solid rgba(229,69,98,0.3);
+  border-radius: 12px;
+  padding: 10px;
+  font-size: 12px;
+  color: #FB8097;
+  margin: 16px 0 12px;
+  display: none;
+}
+.auth-error.show {
+  display: block;
+}
+.auth-submit-btn {
+  width: 100%;
+  background: linear-gradient(135deg, var(--gold), #A86E28);
+  border: none;
+  border-radius: 40px;
+  padding: 14px;
+  font-family: var(--sans);
+  font-weight: 700;
+  font-size: 16px;
+  color: #0A0600;
+  cursor: pointer;
+  margin-top: 8px;
+  box-shadow: 0 4px 14px rgba(200,136,58,0.3);
+  transition: transform 0.15s;
+}
+.auth-submit-btn:active {
+  transform: scale(0.97);
+}
+.auth-switch-text {
+  margin-top: 20px;
+  font-size: 12px;
+  color: var(--muted2);
+}
+.auth-switch-link {
+  color: var(--gold2);
+  font-weight: 600;
+  cursor: pointer;
+  text-decoration: underline;
+}
+.auth-logout-link {
+  margin-top: 16px;
+  font-size: 12px;
+  color: var(--muted);
+  cursor: pointer;
+  display: inline-block;
+  border-top: 1px solid rgba(255,255,255,0.05);
+  padding-top: 16px;
+  width: 100%;
+}
 </style>
 </head>
 <body>
 <div class="orb orb1"></div><div class="orb orb2"></div><div class="orb orb3"></div>
 
-<!-- AUTH OVERLAY -->
+<!-- AUTH OVERLAY (fully styled) -->
 <div id="auth-overlay">
   <div class="auth-screen" id="auth-login">
     <div class="auth-brand-eye">Smart Duka</div>
     <div class="auth-brand-name">Smart <em>Duka</em></div>
-    <div class="auth-orb-ring" style="background:none;border:none;box-shadow:none;width:160px;height:160px;">
+    <div class="auth-orb-ring" style="background:none;border:none;box-shadow:none;width:160px;height:160px;margin:0 auto 20px;">
       <img src="data:image/jpeg;base64,/9j/4QEfRXhpZgAATU0AKgAAAAgABQEAAAMAAAABAtAAAAEBAAMAAAABAeAAAAExAAIAAAApAAAASodpAAQAAAABAAAAcwESAAQAAAABAAAAAAAAAABBbmRyb2lkIEJQMkEuMjUwNjA1LjAzMS5BMy5BMDc1RlhYUzRCWkI2AAAEkAMAAgAAABQAAACpkpEAAgAAAAQxMjcAkBEAAgAAAAcAAAC9kggABAAAAAEAAAAAAAAAADIwMjY6MDQ6MDggMTk6Mzk6MTkAKzAzOjAwAAADAQAAAwAAAAEC0AAAATEAAgAAACkAAADuAQEAAwAAAAEB4AAAAAAAAEFuZHJvaWQgQlAyQS4yNTA2MDUuMDMxLkEzLkEwNzVGWFhTNEJaQjYA/+AAEEpGSUYAAQEAAAEAAQAA/+ICGElDQ19QUk9GSUxFAAEBAAACCAAAAAAEMAAAbW50clJHQiBYWVogB+AAAQABAAAAAAAAYWNzcAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAEAAPbWAAEAAAAA0y0AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAJZGVzYwAAAPAAAABkclhZWgAAAVQAAAAUZ1hZWgAAAWgAAAAUYlhZWgAAAXwAAAAUd3RwdAAAAZAAAAAUclRSQwAAAaQAAAAoZ1RSQwAAAaQAAAAoYlRSQwAAAaQAAAAoY3BydAAAAcwAAAA8bWx1YwAAAAAAAAABAAAADGVuVVMAAABGAAAAHABEAGkAcwBwAGwAYQB5ACAAUAAzACAARwBhAG0AdQB0ACAAdwBpAHQAaAAgAHMAUgBHAEIAIABUAHIAYQBuAHMAZgBlAHIAAFhZWiAAAAAAAACD3QAAPb7///+7WFlaIAAAAAAAAEq/AACxNwAACrlYWVogAAAAAAAAKDsAABELAADIy1hZWiAAAAAAAAD21gABAAAAANMtcGFyYQAAAAAABAAAAAJmZgAA8qcAAA1ZAAAT0AAAClsAAAAAAAAAAG1sdWMAAAAAAAAAAQAAAAxlblVTAAAAIAAAABwARwBvAG8AZwBsAGUAIABJAG4AYwAuACAAMgAwADEANv/bAEMAAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAf/bAEMBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAf/AABEIAeAC0AMBIgACEQEDEQH/xAAfAAACAQQDAQEAAAAAAAAAAAAEBQMCBgkKAAEIBwv/xABFEAACAQMEAQIDBgQFAwQBAgcBAgMABBEFBhIhBxMxCCJBCRQVFiMyUCVhcYEkJTNSFjM0QnKRF0NigiWRU3Ox0eH/xAAUAQEAAAAAAAAAAAAAAAAAAAAA/8QAFBEBAAAAAAAAAAAAAAAAAAAAAP/aAAwDAQACEQMRAD8A7eK9/LDTTv8A1p61F++c80pF+y/aH+0V+X9u3/3/APf/AP8A/wD/AP8A/wD/AP8A/8QAMBEAAgIBBAEDAwMFAQEBAQAAAAECERIDITFBBBMiUQYTFTJxFSNCgZEjUpGhMGL/2gAIAQEAAD8A+HhD/eR/C+of2L/6f/6/r/+vX/8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8Q=" alt="Sage Logo" style="width:100%;height:100%;object-fit:contain;border-radius:0;">
     </div>
     <div class="auth-tabs">
@@ -564,10 +717,9 @@ function calc(){
   return{total,exp,mpesa,cash,profit,low};
 }
 
-// --- sp() payment method selector (FIXED) ---
+// --- sp() payment method selector ---
 function sp(method){
   payM = method;
-  // Update UI
   document.querySelectorAll('.popt-3').forEach(btn=>btn.classList.remove('sc','sm','sd'));
   if(method === 'cash') document.getElementById('pc').classList.add('sc');
   else if(method === 'mpesa') document.getElementById('pm').classList.add('sm');
@@ -576,7 +728,7 @@ function sp(method){
   if(notice) notice.style.display = (method === 'credit') ? 'flex' : 'none';
 }
 
-// --- Dashboard (added weekly bars) ---
+// --- Dashboard (with weekly bars) ---
 function renderDashboard(){ 
   const{total,exp,mpesa,cash,profit,low}=calc(); 
   const circ=2*Math.PI*37; 
@@ -611,8 +763,8 @@ function renderDashboard(){
     const d = new Date(s.date);
     const diff = (now - d) / (1000*3600*24);
     if(diff >=0 && diff < 7){
-      let dayIndex = d.getDay(); // 0=Sun
-      dayIndex = dayIndex === 0 ? 6 : dayIndex-1; // convert to Mon=0
+      let dayIndex = d.getDay();
+      dayIndex = dayIndex === 0 ? 6 : dayIndex-1;
       daySales[dayIndex] += s.amount;
     }
   });
@@ -639,27 +791,20 @@ function renderSales(){
   }).join('');
 }
 
-// --- DELETE sale with full financial reversal (FIXED) ---
+// --- DELETE sale with full financial reversal ---
 async function deleteSale(id){
   if(!confirm('Delete this sale? This will revert customer balance changes.')) return;
   const sale = sales.find(s => s.id === id);
   if(!sale) return;
-  // Reverse customer balance effects
   if(sale.customerId){
     const cust = customers.find(c => c.id === sale.customerId);
     if(cust){
-      // Reverse totalSpent
       cust.totalSpent = Math.max(0, (cust.totalSpent || 0) - sale.amount);
       if(sale.payment_method === 'credit'){
-        // Reverse credit increase
         cust.credit = Math.max(0, (cust.credit || 0) - sale.amount);
-      } else {
-        // For cash/mpesa we didn't affect credit/debit, but we added a 'sale' transaction; we need to delete that transaction.
-        // No balance change for cash sales, only totalSpent already reverted.
       }
       cust.balance = (cust.credit || 0) - (cust.debit || 0);
       await updateItem('customers', cust);
-      // Delete associated customer transaction if exists
       const relatedTxns = customerTransactions.filter(t => t.customerId === cust.id && t.amount === sale.amount && Math.abs(new Date(t.date) - new Date(sale.date)) < 1000);
       for(let t of relatedTxns){
         await deleteItem('customerTransactions', t.id);
@@ -723,7 +868,6 @@ async function recordSale(){
   };
   if(paymentMethod==='credit') saleData.status='unpaid';
   
-  // Update customer finances
   cust.totalSpent = (cust.totalSpent || 0) + amt;
   if(paymentMethod === 'credit'){
     cust.credit = (cust.credit || 0) + amt;
@@ -736,7 +880,6 @@ async function recordSale(){
       date: new Date().toISOString()
     });
   } else {
-    // Cash or M-Pesa: no debt change, just record a sale transaction (type 'sale')
     await addItem('customerTransactions',{
       customerId: cust.id,
       type: 'sale',
@@ -749,7 +892,6 @@ async function recordSale(){
   
   await addItem('sales',saleData);
   await refreshData();
-  // Reset modal fields
   document.getElementById('s-prod-name').value='';
   document.getElementById('s-amt').value='';
   document.getElementById('customer-name-input').value='';
