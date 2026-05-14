@@ -3,338 +3,761 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=yes, viewport-fit=cover">
-    <title>Smart Duka · Premium POS & Invoices</title>
-    <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;0,600;1,300;1,400;1,500&family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <title>Smart Duka Pro · Complete POS Suite</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,300;14..32,400;14..32,500;14..32,600;14..32,700&family=Playfair+Display:ital,wght@0,400;0,500;0,600;1,400&display=swap" rel="stylesheet">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/qrcodejs@1.0.0/qrcode.min.js"></script>
     <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            -webkit-tap-highlight-color: transparent;
+        }
+
         :root {
-            --bg: #0B0B0B; --s1: #0C1310; --s2: #121A14; --s3: #182019;
-            --border: rgba(255,255,255,0.06); --border2: rgba(255,255,255,0.12);
-            --gold: #C8883A; --gold2: #E9B96E; --gold3: rgba(200,136,58,0.15);
-            --em: #0A9167; --em2: #34D399; --rose: #E54562; --sapp: #4A9EDF;
-            --text: #EDF0EE; --text2: #C8D4CB; --muted: #526659; --muted2: #8CA396;
-            --serif: 'Cormorant Garamond', Georgia, serif; --sans: 'Outfit', system-ui, sans-serif;
-            --r: 20px; --r2: 14px; --r3: 10px;
-            --sidebar-w: 250px;
+            --bg-deep: #070c0a;
+            --bg-surface: #0e1512;
+            --bg-elevated: #141d19;
+            --border-subtle: rgba(255, 255, 255, 0.05);
+            --border-med: rgba(255, 255, 255, 0.1);
+            --gold-primary: #c9853a;
+            --gold-glow: #e6b062;
+            --gold-soft: rgba(201, 133, 58, 0.15);
+            --emerald: #109b6b;
+            --emerald-light: #2ddb9a;
+            --rose: #e5484d;
+            --blue-accent: #3b82f6;
+            --text-white: #f0f3f1;
+            --text-off: #bccfc2;
+            --text-muted: #6f7e74;
+            --radius-card: 1.5rem;
+            --radius-sm: 0.85rem;
+            --sidebar-w: 270px;
         }
-        * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
-        body { font-family: var(--sans); background: #050807; color: var(--text); min-height: 100vh; overflow-x: hidden; }
-        #app { display: flex; min-height: 100vh; position: relative; }
-        /* Sidebar Desktop */
-        .sidebar { width: var(--sidebar-w); background: rgba(8,12,10,0.96); backdrop-filter: blur(30px); border-right: 1px solid var(--border); display: flex; flex-direction: column; padding: 24px 0; position: fixed; top: 0; left: 0; bottom: 0; z-index: 40; transition: transform 0.3s ease; }
-        .sidebar .logo { padding: 0 24px 30px; border-bottom: 1px solid var(--border); margin-bottom: 20px; font-family: var(--serif); font-size: 28px; color: var(--text); }
-        .sidebar .logo em { color: var(--gold); font-style: italic; }
-        .side-nav { flex: 1; padding: 0 12px; overflow-y: auto; }
-        .side-item { display: flex; align-items: center; gap: 12px; padding: 12px 16px; border-radius: 14px; color: var(--muted2); font-weight: 500; font-size: 14px; cursor: pointer; margin-bottom: 2px; transition: 0.2s; border: none; background: transparent; width: 100%; text-align: left; }
-        .side-item.on { background: rgba(200,136,58,0.12); color: var(--gold2); }
-        .side-item i { font-style: normal; font-size: 18px; }
-        /* Main */
-        .main { flex: 1; margin-left: var(--sidebar-w); display: flex; flex-direction: column; }
+
+        body {
+            font-family: 'Inter', system-ui, -apple-system, sans-serif;
+            background: var(--bg-deep);
+            color: var(--text-white);
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+
+        /* Layout */
+        .app-layout {
+            display: flex;
+            min-height: 100vh;
+        }
+
+        /* Sidebar (desktop) */
+        .sidebar {
+            width: var(--sidebar-w);
+            background: rgba(10, 17, 14, 0.96);
+            backdrop-filter: blur(28px);
+            border-right: 1px solid var(--border-subtle);
+            position: fixed;
+            top: 0;
+            left: 0;
+            bottom: 0;
+            padding: 2rem 0;
+            display: flex;
+            flex-direction: column;
+            z-index: 40;
+            transition: transform 0.25s ease;
+        }
+
+        .logo-area {
+            padding: 0 1.5rem 2rem 1.5rem;
+            border-bottom: 1px solid var(--border-subtle);
+            margin-bottom: 1.75rem;
+            font-family: 'Playfair Display', serif;
+            font-size: 1.8rem;
+            letter-spacing: -0.3px;
+        }
+
+        .logo-area em {
+            color: var(--gold-primary);
+            font-style: italic;
+            font-weight: 600;
+        }
+
+        .nav-list {
+            flex: 1;
+            padding: 0 1rem;
+            display: flex;
+            flex-direction: column;
+            gap: 0.25rem;
+        }
+
+        .nav-item {
+            display: flex;
+            align-items: center;
+            gap: 0.875rem;
+            padding: 0.75rem 1rem;
+            border-radius: 0.9rem;
+            background: transparent;
+            border: none;
+            color: var(--text-muted);
+            font-weight: 500;
+            font-size: 0.9rem;
+            cursor: pointer;
+            transition: all 0.2s;
+            width: 100%;
+            text-align: left;
+        }
+
+        .nav-item i {
+            font-style: normal;
+            font-size: 1.25rem;
+        }
+
+        .nav-item.active {
+            background: var(--gold-soft);
+            color: var(--gold-glow);
+        }
+
+        /* Main content */
+        .main-content {
+            flex: 1;
+            margin-left: var(--sidebar-w);
+            padding: 1.5rem 2rem 6rem;
+        }
+
+        /* Mobile adjustments */
         @media (max-width: 1024px) {
-            .sidebar { transform: translateX(-100%); z-index: 100; }
-            .sidebar.open { transform: translateX(0); }
-            .main { margin-left: 0; }
+            .sidebar {
+                transform: translateX(-100%);
+            }
+            .sidebar.mobile-open {
+                transform: translateX(0);
+            }
+            .main-content {
+                margin-left: 0;
+                padding: 1rem 1rem 5rem;
+            }
+            .mobile-header {
+                display: flex;
+                align-items: center;
+                gap: 1rem;
+                background: rgba(7, 12, 10, 0.9);
+                backdrop-filter: blur(16px);
+                position: sticky;
+                top: 0;
+                padding: 0.8rem 1rem;
+                border-bottom: 1px solid var(--border-subtle);
+                z-index: 30;
+            }
         }
-        .mobile-header { display: none; align-items: center; padding: 12px 16px; background: rgba(5,8,7,0.95); backdrop-filter: blur(20px); position: sticky; top: 0; z-index: 35; border-bottom: 1px solid var(--border); }
-        @media (max-width: 1024px) { .mobile-header { display: flex; } }
-        .content { padding: 20px 24px 80px; flex: 1; }
-        @media (max-width: 768px) { .content { padding: 12px 16px 100px; } }
-        .pane { display: none; flex-direction: column; gap: 16px; animation: fadeSlide 0.3s ease; }
-        .pane.on { display: flex; }
-        @keyframes fadeSlide { from { opacity: 0; transform: translateY(12px); } }
-        .glass-card { background: rgba(12,19,16,0.75); backdrop-filter: blur(24px); border: 1px solid var(--border); border-radius: var(--r); padding: 24px; }
-        .btn { border: none; border-radius: 100px; padding: 12px 20px; font-weight: 600; font-size: 14px; cursor: pointer; display: inline-flex; align-items: center; gap: 8px; background: var(--s2); color: var(--text2); transition: all 0.2s; }
-        .btn-gold { background: linear-gradient(135deg, var(--gold), #A86E28); color: #0A0600; }
-        .btn-em { background: linear-gradient(135deg, var(--em), #076B4E); color: #fff; }
-        .toast { position: fixed; bottom: 24px; right: 24px; background: var(--em); color: #fff; padding: 14px 24px; border-radius: 40px; font-weight: 600; z-index: 200; box-shadow: 0 10px 30px rgba(0,0,0,0.4); animation: toastIn 0.3s ease; }
-        @keyframes toastIn { from { transform: translateY(20px); opacity: 0; } }
-        .modal-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.8); backdrop-filter: blur(10px); z-index: 100; display: none; align-items: flex-end; justify-content: center; }
-        .modal-overlay.on { display: flex; }
-        .modal-sheet { background: rgba(10,15,11,0.98); backdrop-filter: blur(40px); border: 1px solid rgba(255,255,255,0.08); border-radius: 28px 28px 0 0; width: 100%; max-width: 500px; max-height: 90vh; overflow-y: auto; padding: 24px; animation: slideUp 0.3s ease; }
-        @media (min-width: 768px) { .modal-sheet { border-radius: 28px; margin: auto; } }
-        @keyframes slideUp { from { transform: translateY(100%); } }
-        .flex-row { display: flex; gap: 10px; align-items: center; flex-wrap: wrap; }
-        .bottom-nav { position: fixed; bottom: 16px; left: 16px; right: 16px; background: rgba(8,12,10,0.9); backdrop-filter: blur(30px); border: 1px solid var(--border2); border-radius: 30px; display: flex; justify-content: space-around; padding: 8px; z-index: 50; display: none; }
-        @media (max-width: 1024px) { .bottom-nav { display: flex; } }
-        .bottom-nav-item { flex: 1; display: flex; flex-direction: column; align-items: center; padding: 8px; color: var(--muted); font-size: 10px; font-weight: 600; border: none; background: transparent; }
-        .bottom-nav-item.on { color: var(--gold); background: var(--gold3); border-radius: 20px; }
-        .invoice-paper { background: #fff; color: #111; border-radius: 12px; padding: 20px; max-width: 400px; margin: auto; font-family: 'Courier New', monospace; }
-        @media print { body * { visibility: hidden; } .invoice-paper, .invoice-paper * { visibility: visible; } .invoice-paper { position: absolute; left: 0; top: 0; width: 100%; } }
-        .qr-container { display: flex; justify-content: center; margin: 10px 0; }
-        /* Animations */
-        .scale-in { animation: scaleIn 0.25s ease; }
-        @keyframes scaleIn { from { transform: scale(0.9); opacity: 0; } }
+
+        @media (min-width: 1025px) {
+            .mobile-header {
+                display: none;
+            }
+        }
+
+        .bottom-nav {
+            position: fixed;
+            bottom: 1rem;
+            left: 1rem;
+            right: 1rem;
+            background: rgba(12, 18, 15, 0.96);
+            backdrop-filter: blur(20px);
+            border: 1px solid var(--border-med);
+            border-radius: 3rem;
+            display: flex;
+            justify-content: space-around;
+            padding: 0.5rem;
+            z-index: 45;
+            display: none;
+        }
+
+        @media (max-width: 1024px) {
+            .bottom-nav {
+                display: flex;
+            }
+        }
+
+        .bottom-nav-btn {
+            flex: 1;
+            background: transparent;
+            border: none;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 0.2rem;
+            padding: 0.5rem;
+            color: var(--text-muted);
+            font-size: 0.7rem;
+            font-weight: 500;
+            border-radius: 2rem;
+            transition: all 0.2s;
+        }
+
+        .bottom-nav-btn.active {
+            background: var(--gold-soft);
+            color: var(--gold-glow);
+        }
+
+        /* UI Components */
+        .card {
+            background: var(--bg-surface);
+            backdrop-filter: blur(12px);
+            border: 1px solid var(--border-subtle);
+            border-radius: var(--radius-card);
+            padding: 1.5rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .card-header {
+            font-weight: 600;
+            font-size: 1.25rem;
+            margin-bottom: 1.25rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .btn {
+            border: none;
+            border-radius: 2.5rem;
+            padding: 0.65rem 1.25rem;
+            font-weight: 600;
+            font-size: 0.8rem;
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            background: var(--bg-elevated);
+            color: var(--text-off);
+            transition: 0.2s;
+        }
+
+        .btn-primary {
+            background: linear-gradient(105deg, var(--gold-primary), #b26b2c);
+            color: #0a0500;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+        }
+
+        .btn-success {
+            background: linear-gradient(135deg, var(--emerald), #0a7852);
+            color: white;
+        }
+
+        .btn-outline {
+            border: 1px solid var(--border-med);
+            background: transparent;
+        }
+
+        .input, .select {
+            background: rgba(0, 0, 0, 0.4);
+            border: 1px solid var(--border-med);
+            border-radius: 1rem;
+            padding: 0.75rem 1rem;
+            color: white;
+            font-size: 0.85rem;
+            width: 100%;
+            outline: none;
+            transition: 0.2s;
+        }
+
+        .input:focus, .select:focus {
+            border-color: var(--gold-primary);
+        }
+
+        .grid-2 {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+            gap: 1rem;
+        }
+
+        .invoice-paper {
+            background: white;
+            color: #1a2a24;
+            border-radius: 1rem;
+            padding: 1.5rem;
+            font-family: 'Inter', monospace;
+            max-width: 400px;
+            margin: 0 auto;
+        }
+
+        .qr-container {
+            display: flex;
+            justify-content: center;
+            margin: 1rem 0;
+        }
+
+        .toast {
+            position: fixed;
+            bottom: 2rem;
+            right: 1.5rem;
+            background: var(--emerald);
+            color: white;
+            padding: 0.8rem 1.5rem;
+            border-radius: 3rem;
+            font-weight: 600;
+            z-index: 200;
+            backdrop-filter: blur(8px);
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.3);
+            animation: fadeUp 0.2s ease;
+        }
+
+        @keyframes fadeUp {
+            from {
+                opacity: 0;
+                transform: translateY(12px);
+            }
+        }
+
+        .modal {
+            position: fixed;
+            inset: 0;
+            background: rgba(0, 0, 0, 0.85);
+            backdrop-filter: blur(12px);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 100;
+            visibility: hidden;
+            opacity: 0;
+            transition: 0.2s;
+        }
+
+        .modal.open {
+            visibility: visible;
+            opacity: 1;
+        }
+
+        .modal-card {
+            background: var(--bg-elevated);
+            border-radius: 2rem;
+            max-width: 500px;
+            width: 90%;
+            max-height: 85vh;
+            overflow-y: auto;
+            padding: 1.5rem;
+            border: 1px solid var(--border-med);
+        }
+
+        hr {
+            border-color: var(--border-subtle);
+            margin: 0.8rem 0;
+        }
     </style>
 </head>
 <body>
-<div id="app">
+<div class="app-layout">
     <aside class="sidebar" id="sidebar">
-        <div class="logo">Smart <em>Duka</em></div>
-        <nav class="side-nav" id="sideNav"></nav>
+        <div class="logo-area">Smart <em>Duka Pro</em></div>
+        <nav class="nav-list" id="navList"></nav>
     </aside>
-    <div class="main">
+    <div class="main-content" id="mainContent">
         <div class="mobile-header">
-            <button class="btn" onclick="document.getElementById('sidebar').classList.toggle('open')">☰</button>
-            <span style="font-family:var(--serif);font-size:22px">Smart <em style="color:var(--gold)">Duka</em></span>
+            <button class="btn btn-outline" id="menuToggle">☰</button>
+            <span style="font-family: 'Playfair Display', serif; font-size: 1.5rem;">Smart <em style="color: var(--gold-primary);">Duka</em></span>
         </div>
-        <div class="content" id="mainContent"></div>
+        <div id="dynamicPanel"></div>
     </div>
     <div class="bottom-nav" id="bottomNav"></div>
 </div>
-<div id="toast" class="toast" style="display:none"></div>
-<div class="modal-overlay" id="modalContainer"></div>
+<div id="toastMessage" class="toast" style="display: none;"></div>
+<div id="globalModal" class="modal"></div>
 
 <script>
-// ---------- DATABASE & STATE ----------
-const DB_NAME = 'smartduka_premium_v2';
-let db, currentUser = { shopName: 'Smart Duka', till: '123456', paybill: '789012', pochi: '345678' };
-let products=[], sales=[], expenses=[], customers=[], customerTxns=[], invoices=[];
-let activeTab = 'dashboard', selectedInvoiceTemplate = 'modern';
+    // ----------------------------- DATABASE & STATE -------------------------
+    const DB_NAME = 'smartduka_pro_unified';
+    let db;
+    let products = [];
+    let sales = [];
+    let expenses = [];
+    let customers = [];
+    let invoices = [];
+    let activeModule = 'dashboard';
 
-// ---------- INDEXEDDB ----------
-function openDB() {
-    return new Promise((res, rej) => {
-        const req = indexedDB.open(DB_NAME, 2);
-        req.onupgradeneeded = e => {
-            const d = e.target.result;
-            ['products','sales','expenses','customers','customerTransactions','invoices'].forEach(s => {
-                if(!d.objectStoreNames.contains(s)) d.createObjectStore(s, {keyPath:'id', autoIncrement:true});
-            });
-        };
-        req.onsuccess = e => { db = e.target.result; res(); };
-        req.onerror = rej;
-    });
-}
-function getAll(store) { return new Promise(r => { const tx = db.transaction(store,'readonly').objectStore(store).getAll(); tx.onsuccess = () => r(tx.result); }); }
-function addItem(store, item) { return new Promise(r => { const tx = db.transaction(store,'readwrite'); const req = tx.objectStore(store).add(item); req.onsuccess = () => r(req.result); }); }
-function updateItem(store, item) { return new Promise(r => { const tx = db.transaction(store,'readwrite'); tx.objectStore(store).put(item); tx.oncomplete = () => r(); }); }
-function deleteItem(store, id) { return new Promise(r => { const tx = db.transaction(store,'readwrite'); tx.objectStore(store).delete(id); tx.oncomplete = () => r(); }); }
-
-// ---------- HELPERS ----------
-const fmt = n => 'KES ' + (n||0).toLocaleString('en-KE');
-const escapeHtml = s => String(s).replace(/[&<>]/g, m => ({'&':'&amp;','<':'&lt;','>':'&gt;'}[m]));
-const genId = () => 'id_'+Date.now()+'_'+Math.random().toString(36).substr(2,6);
-function showToast(msg, type='success') {
-    const t = document.getElementById('toast');
-    t.textContent = msg; t.style.display='block'; t.style.background = type==='error' ? 'var(--rose)' : 'var(--em)';
-    setTimeout(() => t.style.display='none', 3000);
-}
-function openModal(html) {
-    const mc = document.getElementById('modalContainer');
-    mc.innerHTML = `<div class="modal-sheet">${html}<button class="btn" style="margin-top:20px" onclick="closeModal()">Close</button></div>`;
-    mc.classList.add('on');
-    mc.onclick = e => { if(e.target===mc) closeModal(); };
-}
-function closeModal() { document.getElementById('modalContainer').classList.remove('on'); }
-
-// ---------- DATA LOAD ----------
-async function loadData() {
-    [products, sales, expenses, customers, customerTxns, invoices] = await Promise.all([
-        getAll('products'), getAll('sales'), getAll('expenses'), getAll('customers'), getAll('customerTransactions'), getAll('invoices')
-    ]);
-}
-async function seedData() {
-    if(products.length===0) {
-        await addItem('products', {name:'Sugar', unit:'kg', stock_qty:100, low_threshold:10, buying_price:100, selling_price:130});
-        await addItem('products', {name:'Unga', unit:'kg', stock_qty:200, low_threshold:20, buying_price:70, selling_price:90});
-    }
-}
-
-// ---------- UI BUILD ----------
-function buildUI() {
-    const tabs = [
-        {id:'dashboard', icon:'📊', label:'Dashboard'},
-        {id:'sales', icon:'🛒', label:'Sales'},
-        {id:'invoices', icon:'🧾', label:'Invoices'},
-        {id:'products', icon:'📦', label:'Stock'},
-        {id:'customers', icon:'👥', label:'Clients'},
-        {id:'analytics', icon:'📈', label:'Analytics'},
-    ];
-    document.getElementById('sideNav').innerHTML = tabs.map(t => `<button class="side-item" onclick="switchTab('${t.id}')"><i>${t.icon}</i> ${t.label}</button>`).join('');
-    document.getElementById('bottomNav').innerHTML = tabs.map(t => `<button class="bottom-nav-item" onclick="switchTab('${t.id}')"><span>${t.icon}</span> ${t.label}</button>`).join('');
-}
-function switchTab(id) {
-    activeTab = id;
-    document.querySelectorAll('.side-item,.bottom-nav-item').forEach(b => b.classList.remove('on'));
-    document.querySelector(`.side-item[onclick="switchTab('${id}')"]`)?.classList.add('on');
-    document.querySelector(`.bottom-nav-item[onclick="switchTab('${id}')"]`)?.classList.add('on');
-    renderTab(id);
-    if(window.innerWidth <=1024) document.getElementById('sidebar').classList.remove('open');
-}
-function renderTab(id) {
-    const c = document.getElementById('mainContent');
-    switch(id) {
-        case 'dashboard': c.innerHTML = dashboardHTML(); break;
-        case 'sales': c.innerHTML = salesHTML(); attachSalesEvents(); break;
-        case 'invoices': c.innerHTML = invoicesHTML(); renderInvoiceList(); break;
-        case 'products': c.innerHTML = productsHTML(); renderProductList(); break;
-        case 'customers': c.innerHTML = customersHTML(); renderCustomerList(); break;
-        case 'analytics': c.innerHTML = analyticsHTML(); break;
-    }
-}
-
-// ---------- DASHBOARD ----------
-function dashboardHTML() {
-    const rev = sales.reduce((a,b)=>a+b.amount,0);
-    return `<div class="glass-card"><h3>Today's Revenue</h3><div style="font-size:36px;font-family:var(--serif)">${fmt(rev)}</div></div>`;
-}
-
-// ---------- SALES & INVOICE GENERATION ----------
-function salesHTML() {
-    return `<div class="glass-card">
-        <h3>New Sale</h3>
-        <input id="custName" placeholder="Customer name" class="input" style="width:100%;margin:8px 0"><br>
-        <select id="prodSelect" style="width:100%;margin:8px 0">${products.map(p=>`<option value="${p.id}">${p.name} (${p.stock_qty} ${p.unit})</option>`)}</select><br>
-        <input id="qty" type="number" placeholder="Qty" value="1" style="width:100%;margin:8px 0"><br>
-        <input id="amount" type="number" placeholder="Amount (KES)" style="width:100%;margin:8px 0"><br>
-        <select id="payMethod" style="width:100%;margin:8px 0"><option value="cash">Cash</option><option value="mpesa">M-Pesa</option><option value="credit">Credit</option></select><br>
-        <button class="btn btn-gold" id="recordSaleBtn">✅ Record Sale & Generate Invoice</button>
-    </div>
-    <div id="lastInvoice" class="glass-card" style="display:none"></div>`;
-}
-function attachSalesEvents() {
-    document.getElementById('recordSaleBtn').onclick = recordSale;
-}
-async function recordSale() {
-    const custName = document.getElementById('custName').value.trim();
-    const prodId = parseInt(document.getElementById('prodSelect').value);
-    const qty = parseFloat(document.getElementById('qty').value)||1;
-    const amount = parseFloat(document.getElementById('amount').value)||0;
-    const method = document.getElementById('payMethod').value;
-    if(!custName || !amount) return showToast('Fill all fields','error');
-    const prod = products.find(p=>p.id===prodId);
-    if(prod && prod.stock_qty < qty) return showToast('Not enough stock!','error');
-    // deduct stock
-    if(prod) { prod.stock_qty -= qty; await updateItem('products', prod); }
-    const sale = { product: prod?.name || 'Item', qty, amount, method, customerName: custName, date: new Date().toISOString() };
-    sale.id = await addItem('sales', sale);
-    // customer credit
-    let cust = customers.find(c=>c.name.toLowerCase()===custName.toLowerCase());
-    if(!cust) { cust = { name: custName, phone:'', balance:0, credit:0, debit:0 }; cust.id = await addItem('customers', cust); }
-    if(method==='credit') { cust.credit += amount; cust.balance = cust.credit - cust.debit; await updateItem('customers', cust); }
-    // generate invoice
-    const invNum = `INV-${new Date().getFullYear()}-${String(invoices.length+1).padStart(4,'0')}`;
-    const invoice = {
-        number: invNum, saleId: sale.id, customerName: custName,
-        items: [{ name: prod?.name||'Item', qty, price: amount, unit: prod?.unit||'' }],
-        total: amount, method, date: new Date().toISOString(), shop: currentUser.shopName, template: selectedInvoiceTemplate
+    // Helper functions
+    const formatMoney = (val) => `KES ${(val || 0).toLocaleString('en-KE')}`;
+    const showToast = (msg, isError = false) => {
+        const toast = document.getElementById('toastMessage');
+        toast.textContent = msg;
+        toast.style.background = isError ? '#e5484d' : '#109b6b';
+        toast.style.display = 'block';
+        setTimeout(() => toast.style.display = 'none', 2800);
     };
-    invoice.id = await addItem('invoices', invoice);
-    invoices.push(invoice);
-    showInvoicePreview(invoice);
-    showToast('Invoice generated!');
-    loadData();
-}
-function showInvoicePreview(inv) {
-    const div = document.getElementById('lastInvoice');
-    div.style.display = 'block';
-    div.innerHTML = renderInvoiceHTML(inv) + `<div class="flex-row"><button class="btn btn-em" onclick="printInvoice(${inv.id})">🖨️ Print</button>
-    <button class="btn" onclick="shareWhatsApp(${inv.id})">📲 WhatsApp</button>
-    <button class="btn" onclick="downloadPDF(${inv.id})">📄 PDF</button></div>`;
-}
 
-// ---------- INVOICE RENDERING ----------
-function renderInvoiceHTML(inv) {
-    const items = inv.items.map(i => `<tr><td>${i.name}</td><td>${i.qty} ${i.unit||''}</td><td>${fmt(i.price)}</td></tr>`).join('');
-    const qrId = 'qr-'+inv.id;
-    setTimeout(() => {
-        const qrEl = document.getElementById(qrId);
-        if(qrEl) new QRCode(qrEl, { text: `INV:${inv.number}`, width: 60, height: 60 });
-    }, 100);
-    return `<div class="invoice-paper" id="invoice-${inv.id}">
-        <h3 style="text-align:center">${inv.shop}</h3>
-        <p style="text-align:center">${inv.number} | ${new Date(inv.date).toLocaleString()}</p>
-        <hr><p><b>Customer:</b> ${inv.customerName}</p>
-        <table style="width:100%"><tr><th>Item</th><th>Qty</th><th>Price</th></tr>${items}</table>
-        <hr><p><b>Total:</b> ${fmt(inv.total)} | <b>Method:</b> ${inv.method}</p>
-        <p style="text-align:center">Thank you!</p>
-        <div class="qr-container" id="${qrId}"></div>
-    </div>`;
-}
-async function printInvoice(id) {
-    const inv = invoices.find(i=>i.id===id); if(!inv) return;
-    const win = window.open('','','width=400,height=600');
-    win.document.write(`<html><head><title>Invoice</title><style>body{font-family:monospace} .invoice-paper{max-width:300px;margin:auto}</style></head><body>${renderInvoiceHTML(inv)}</body></html>`);
-    win.document.close();
-    setTimeout(() => { win.print(); win.close(); }, 500);
-}
-async function downloadPDF(id) {
-    const inv = invoices.find(i=>i.id===id); if(!inv) return;
-    const el = document.createElement('div'); el.innerHTML = renderInvoiceHTML(inv);
-    document.body.appendChild(el);
-    await html2pdf().set({margin:0,filename:`invoice-${inv.number}.pdf`}).from(el).save();
-    document.body.removeChild(el);
-}
-function shareWhatsApp(id) {
-    const inv = invoices.find(i=>i.id===id); if(!inv) return;
-    const cust = customers.find(c=>c.name===inv.customerName);
-    const phone = cust?.phone || prompt('Enter customer phone (2547...):');
-    if(!phone) return;
-    const msg = `🧾 *Invoice ${inv.number}*\n👤 ${inv.customerName}\n💰 Total: ${fmt(inv.total)}\n📅 ${new Date(inv.date).toLocaleDateString()}\n🏪 ${currentUser.shopName}\n🙏 Thank you!`;
-    window.open(`https://wa.me/${phone.replace(/\D/g,'')}?text=${encodeURIComponent(msg)}`,'_blank');
-}
+    // IndexedDB
+    function openDatabase() {
+        return new Promise((resolve, reject) => {
+            const request = indexedDB.open(DB_NAME, 3);
+            request.onupgradeneeded = (e) => {
+                const dbRef = e.target.result;
+                const stores = ['products', 'sales', 'expenses', 'customers', 'invoices'];
+                stores.forEach(store => {
+                    if (!dbRef.objectStoreNames.contains(store)) {
+                        dbRef.createObjectStore(store, { keyPath: 'id', autoIncrement: true });
+                    }
+                });
+            };
+            request.onsuccess = (e) => { db = e.target.result; resolve(); };
+            request.onerror = () => reject(request.error);
+        });
+    }
 
-// ---------- INVOICE HISTORY ----------
-function invoicesHTML() { return `<div class="glass-card"><h3>Invoice History</h3><div id="invoiceList"></div></div>`; }
-function renderInvoiceList() {
-    const list = document.getElementById('invoiceList');
-    if(!list) return;
-    list.innerHTML = invoices.slice().reverse().map(inv => `<div style="padding:10px;border-bottom:1px solid var(--border)">
-        <b>${inv.number}</b> - ${inv.customerName} | ${fmt(inv.total)} | ${new Date(inv.date).toLocaleDateString()}
-        <button onclick="viewInvoice(${inv.id})" class="btn" style="margin-left:10px">View</button>
-    </div>`).join('');
-}
-function viewInvoice(id) {
-    const inv = invoices.find(i=>i.id===id); if(!inv) return;
-    openModal(renderInvoiceHTML(inv) + `<button onclick="printInvoice(${id})">Print</button><button onclick="shareWhatsApp(${id})">WhatsApp</button>`);
-}
+    async function getAllFromStore(storeName) {
+        return new Promise((resolve) => {
+            const tx = db.transaction(storeName, 'readonly');
+            const store = tx.objectStore(storeName);
+            const req = store.getAll();
+            req.onsuccess = () => resolve(req.result);
+        });
+    }
 
-// ---------- PRODUCTS ----------
-function productsHTML() { return `<div class="glass-card"><h3>Inventory</h3><div id="prodList"></div><button class="btn btn-gold" onclick="addProductUI()">+ Add Product</button></div>`; }
-function renderProductList() {
-    const list = document.getElementById('prodList');
-    if(!list) return;
-    list.innerHTML = products.map(p => `<div>${p.name} - ${p.stock_qty} ${p.unit} | Sell: ${p.selling_price}</div>`).join('');
-}
-async function addProductUI() {
-    const name = prompt('Product name'); const unit = prompt('Unit (kg, pcs)'); const qty = parseFloat(prompt('Stock')); const buy = parseFloat(prompt('Buy price')); const sell = parseFloat(prompt('Sell price'));
-    if(name) { await addItem('products', {name, unit, stock_qty: qty, low_threshold: Math.max(5,qty*0.1), buying_price: buy, selling_price: sell}); loadData(); renderProductList(); }
-}
+    async function addToStore(storeName, item) {
+        return new Promise((resolve) => {
+            const tx = db.transaction(storeName, 'readwrite');
+            const req = tx.objectStore(storeName).add(item);
+            req.onsuccess = () => resolve(req.result);
+        });
+    }
 
-// ---------- CUSTOMERS ----------
-function customersHTML() { return `<div class="glass-card"><h3>Clients</h3><div id="custList"></div></div>`; }
-function renderCustomerList() {
-    const list = document.getElementById('custList');
-    if(!list) return;
-    list.innerHTML = customers.map(c => `<div>${c.name} | Balance: ${fmt(c.balance||0)}</div>`).join('');
-}
+    async function updateStore(storeName, item) {
+        return new Promise((resolve) => {
+            const tx = db.transaction(storeName, 'readwrite');
+            tx.objectStore(storeName).put(item);
+            tx.oncomplete = () => resolve();
+        });
+    }
 
-// ---------- ANALYTICS ----------
-function analyticsHTML() {
-    const rev = sales.reduce((a,b)=>a+b.amount,0);
-    const profit = rev*0.28 - expenses.reduce((a,b)=>a+b.amount,0);
-    return `<div class="glass-card"><h3>Analytics</h3><p>Revenue: ${fmt(rev)}</p><p>Profit: ${fmt(profit)}</p></div>`;
-}
+    async function loadAllData() {
+        products = await getAllFromStore('products');
+        sales = await getAllFromStore('sales');
+        expenses = await getAllFromStore('expenses');
+        customers = await getAllFromStore('customers');
+        invoices = await getAllFromStore('invoices');
+    }
 
-// ---------- KEYBOARD SHORTCUTS ----------
-document.addEventListener('keydown', e => {
-    if(e.ctrlKey && e.key==='n') { e.preventDefault(); switchTab('sales'); document.getElementById('recordSaleBtn')?.focus(); }
-    if(e.ctrlKey && e.key==='p') { e.preventDefault(); const last = invoices[invoices.length-1]; if(last) printInvoice(last.id); }
-});
+    async function seedInitialData() {
+        if (products.length === 0) {
+            await addToStore('products', { name: 'Premium Sugar', unit: 'kg', stock_qty: 120, buying_price: 95, selling_price: 140 });
+            await addToStore('products', { name: 'Fortified Flour', unit: 'kg', stock_qty: 250, buying_price: 68, selling_price: 92 });
+            await addToStore('products', { name: 'Cooking Oil', unit: 'L', stock_qty: 80, buying_price: 210, selling_price: 270 });
+        }
+        if (expenses.length === 0) {
+            await addToStore('expenses', { description: 'Shop rent', amount: 15000, date: new Date().toISOString() });
+        }
+        await loadAllData();
+    }
 
-// ---------- INIT ----------
-(async function init() {
-    await openDB();
-    await loadData();
-    await seedData();
-    await loadData();
-    buildUI();
-    switchTab('dashboard');
-    window.addEventListener('resize', () => {
-        if(window.innerWidth>1024) document.getElementById('sidebar').classList.remove('open');
+    // ----------------------------- UI NAVIGATION -------------------------
+    const modules = [
+        { id: 'dashboard', icon: '📊', label: 'Dashboard' },
+        { id: 'pos', icon: '🛒', label: 'Point of Sale' },
+        { id: 'invoices', icon: '🧾', label: 'Invoices' },
+        { id: 'inventory', icon: '📦', label: 'Stock' },
+        { id: 'customers', icon: '👥', label: 'Clients' },
+        { id: 'expenses', icon: '💰', label: 'Expenses' },
+        { id: 'analytics', icon: '📈', label: 'Reports' }
+    ];
+
+    function buildNavigation() {
+        const navList = document.getElementById('navList');
+        const bottomNav = document.getElementById('bottomNav');
+        const navItems = modules.map(m => `
+            <button class="nav-item" data-module="${m.id}">
+                <i>${m.icon}</i> ${m.label}
+            </button>
+        `).join('');
+        const bottomItems = modules.map(m => `
+            <button class="bottom-nav-btn" data-module="${m.id}">
+                <span>${m.icon}</span> <span>${m.label}</span>
+            </button>
+        `).join('');
+        navList.innerHTML = navItems;
+        bottomNav.innerHTML = bottomItems;
+
+        document.querySelectorAll('.nav-item, .bottom-nav-btn').forEach(btn => {
+            btn.addEventListener('click', (e) => {
+                const moduleId = btn.getAttribute('data-module');
+                if (moduleId) switchModule(moduleId);
+            });
+        });
+    }
+
+    function switchModule(moduleId) {
+        activeModule = moduleId;
+        document.querySelectorAll('.nav-item, .bottom-nav-btn').forEach(el => el.classList.remove('active'));
+        document.querySelectorAll(`[data-module="${moduleId}"]`).forEach(el => el.classList.add('active'));
+        renderActiveModule();
+        if (window.innerWidth <= 1024) {
+            document.getElementById('sidebar').classList.remove('mobile-open');
+        }
+    }
+
+    function renderActiveModule() {
+        const container = document.getElementById('dynamicPanel');
+        switch (activeModule) {
+            case 'dashboard': container.innerHTML = renderDashboard(); break;
+            case 'pos': container.innerHTML = renderPOS(); attachPOSEvents(); break;
+            case 'invoices': container.innerHTML = renderInvoiceHistory(); renderInvoiceListUI(); break;
+            case 'inventory': container.innerHTML = renderInventory(); renderProductTable(); break;
+            case 'customers': container.innerHTML = renderCustomers(); renderCustomerTable(); break;
+            case 'expenses': container.innerHTML = renderExpenses(); attachExpenseEvents(); break;
+            case 'analytics': container.innerHTML = renderAnalytics(); break;
+            default: container.innerHTML = renderDashboard();
+        }
+    }
+
+    // ----------------------------- DASHBOARD -----------------------------
+    function renderDashboard() {
+        const totalRevenue = sales.reduce((sum, s) => sum + (s.totalAmount || s.amount || 0), 0);
+        const totalExp = expenses.reduce((sum, e) => sum + e.amount, 0);
+        const lowStock = products.filter(p => p.stock_qty <= (p.low_threshold || 5)).length;
+        return `
+            <div class="card">
+                <div class="card-header">🏪 Business Pulse</div>
+                <div class="grid-2">
+                    <div class="card" style="background: var(--bg-elevated);"><strong>📈 Revenue</strong><br><span style="font-size: 2rem;">${formatMoney(totalRevenue)}</span></div>
+                    <div class="card" style="background: var(--bg-elevated);"><strong>📉 Expenses</strong><br><span style="font-size: 2rem;">${formatMoney(totalExp)}</span></div>
+                    <div class="card" style="background: var(--bg-elevated);"><strong>📦 Low Stock Alerts</strong><br><span style="font-size: 2rem;">${lowStock}</span></div>
+                    <div class="card" style="background: var(--bg-elevated);"><strong>👥 Customers</strong><br><span style="font-size: 2rem;">${customers.length}</span></div>
+                </div>
+            </div>
+        `;
+    }
+
+    // ----------------------------- POINT OF SALE (multi-item cart) -----------------------------
+    let currentCart = [];
+    function renderPOS() {
+        const productOptions = products.map(p => `<option value="${p.id}">${p.name} (${p.stock_qty} ${p.unit}) - ${formatMoney(p.selling_price)}</option>`).join('');
+        return `
+            <div class="card">
+                <div class="card-header">🧾 New Transaction</div>
+                <input type="text" id="posCustomer" class="input" placeholder="Customer name" style="margin-bottom: 1rem;">
+                <div class="grid-2" style="margin-bottom: 1rem;">
+                    <select id="posProductSelect" class="select">${productOptions}</select>
+                    <input type="number" id="posQty" class="input" placeholder="Qty" value="1">
+                </div>
+                <div style="display: flex; gap: 0.5rem; margin-bottom: 1rem;">
+                    <button id="addToCartBtn" class="btn btn-primary">➕ Add item</button>
+                    <select id="posPaymentMethod" class="select" style="width: auto;"><option value="cash">Cash</option><option value="mpesa">M-Pesa</option><option value="credit">Credit</option></select>
+                </div>
+                <div id="cartPreview" style="background: var(--bg-deep); border-radius: 1rem; padding: 0.75rem; margin-bottom: 1rem;"></div>
+                <div style="font-weight: bold; margin-bottom: 1rem;">Total: <span id="cartTotal">KES 0</span></div>
+                <button id="completeSaleBtn" class="btn btn-success">✅ Complete Sale & Invoice</button>
+            </div>
+            <div id="liveInvoicePreview" class="card" style="display: none;"></div>
+        `;
+    }
+
+    function updateCartUI() {
+        const container = document.getElementById('cartPreview');
+        const totalSpan = document.getElementById('cartTotal');
+        let total = 0;
+        if (!container) return;
+        container.innerHTML = currentCart.map((item, idx) => {
+            const lineTotal = item.price * item.qty;
+            total += lineTotal;
+            return `<div style="display: flex; justify-content: space-between; border-bottom: 1px solid var(--border-subtle); padding: 0.3rem 0;">${item.name} x${item.qty} → ${formatMoney(lineTotal)} <button class="btn" style="padding: 0.2rem 0.6rem;" data-cartidx="${idx}">✖</button></div>`;
+        }).join('');
+        if (totalSpan) totalSpan.innerText = formatMoney(total);
+        document.querySelectorAll('[data-cartidx]').forEach(btn => {
+            btn.addEventListener('click', (e) => {
+                const idx = parseInt(btn.getAttribute('data-cartidx'));
+                currentCart.splice(idx, 1);
+                updateCartUI();
+            });
+        });
+    }
+
+    function attachPOSEvents() {
+        document.getElementById('addToCartBtn')?.addEventListener('click', () => {
+            const prodId = parseInt(document.getElementById('posProductSelect').value);
+            const qty = parseFloat(document.getElementById('posQty').value) || 1;
+            const product = products.find(p => p.id === prodId);
+            if (!product) return showToast('Product not found', true);
+            if (product.stock_qty < qty) return showToast(`Only ${product.stock_qty} left`, true);
+            const cartItem = { id: product.id, name: product.name, qty, price: product.selling_price, unit: product.unit };
+            currentCart.push(cartItem);
+            updateCartUI();
+            document.getElementById('posQty').value = 1;
+        });
+        document.getElementById('completeSaleBtn')?.addEventListener('click', async () => {
+            const customerName = document.getElementById('posCustomer').value.trim();
+            if (!customerName) return showToast('Customer name required', true);
+            if (currentCart.length === 0) return showToast('Cart empty', true);
+            const method = document.getElementById('posPaymentMethod').value;
+            let totalSale = 0;
+            for (const item of currentCart) totalSale += item.price * item.qty;
+            // Deduct stock
+            for (const cartItem of currentCart) {
+                const prod = products.find(p => p.id === cartItem.id);
+                if (prod) {
+                    prod.stock_qty -= cartItem.qty;
+                    await updateStore('products', prod);
+                }
+            }
+            const saleRecord = { customerName, items: [...currentCart], totalAmount: totalSale, method, date: new Date().toISOString() };
+            const saleId = await addToStore('sales', saleRecord);
+            // Handle customer credit
+            let cust = customers.find(c => c.name.toLowerCase() === customerName.toLowerCase());
+            if (!cust) {
+                const newCust = { name: customerName, phone: '', balance: 0, creditTotal: 0, paidTotal: 0 };
+                const newId = await addToStore('customers', newCust);
+                cust = { ...newCust, id: newId };
+                customers.push(cust);
+            }
+            if (method === 'credit') {
+                cust.creditTotal = (cust.creditTotal || 0) + totalSale;
+                cust.balance = cust.creditTotal - (cust.paidTotal || 0);
+                await updateStore('customers', cust);
+            }
+            // generate invoice
+            const invNumber = `INV-${new Date().getFullYear()}-${String(invoices.length + 1).padStart(5, '0')}`;
+            const newInvoice = { number: invNumber, saleId, customerName, items: currentCart.map(i => ({ name: i.name, qty: i.qty, price: i.price, unit: i.unit })), total: totalSale, method, date: new Date().toISOString(), shopName: 'Smart Duka Pro' };
+            const invoiceId = await addToStore('invoices', newInvoice);
+            invoices.push(newInvoice);
+            showToast(`Invoice ${invNumber} created`);
+            currentCart = [];
+            updateCartUI();
+            document.getElementById('posCustomer').value = '';
+            await loadAllData();
+            renderActiveModule(); // refresh stock view after sale
+            const previewDiv = document.getElementById('liveInvoicePreview');
+            if (previewDiv) {
+                previewDiv.style.display = 'block';
+                previewDiv.innerHTML = renderInvoiceHTML(newInvoice) + `<div class="flex-row" style="display:flex; gap:0.5rem; margin-top:1rem;"><button class="btn btn-primary" onclick="window.printInvoiceById(${invoiceId})">🖨️ Print</button><button class="btn btn-success" onclick="window.shareInvoiceViaWhatsApp(${invoiceId})">📲 WhatsApp</button><button class="btn btn-outline" onclick="window.downloadInvoicePDF(${invoiceId})">📄 PDF</button></div>`;
+            }
+        });
+    }
+
+    // Invoice rendering helpers
+    function renderInvoiceHTML(inv) {
+        const itemsHtml = inv.items.map(i => `<tr><td>${i.name}</td><td>${i.qty} ${i.unit || ''}</td><td>${formatMoney(i.price)}</td></tr>`).join('');
+        const qrId = `qr_inv_${inv.id || Date.now()}`;
+        setTimeout(() => {
+            const qrElem = document.getElementById(qrId);
+            if (qrElem && typeof QRCode !== 'undefined') new QRCode(qrElem, { text: `INV:${inv.number}`, width: 70, height: 70 });
+        }, 80);
+        return `<div class="invoice-paper" id="printableInvoice">
+            <h3 style="text-align:center;">${inv.shopName || 'Smart Duka Pro'}</h3>
+            <p style="text-align:center;">${inv.number} | ${new Date(inv.date).toLocaleString()}</p>
+            <hr><p><strong>Customer:</strong> ${inv.customerName}</p>
+            <table style="width:100%; margin: 10px 0;"><thead><tr><th>Item</th><th>Qty</th><th>Price</th></tr></thead><tbody>${itemsHtml}</tbody></table>
+            <hr><p><strong>Total:</strong> ${formatMoney(inv.total)} | <strong>Paid via:</strong> ${inv.method}</p>
+            <p style="text-align:center;">Asante sana, karibu tena!</p>
+            <div id="${qrId}" class="qr-container"></div>
+        </div>`;
+    }
+
+    window.printInvoiceById = async (id) => {
+        const inv = invoices.find(i => i.id === id);
+        if (!inv) return;
+        const win = window.open('', '_blank', 'width=450,height=600');
+        win.document.write(`<html><head><title>Invoice ${inv.number}</title><style>body{font-family:monospace;}</style></head><body>${renderInvoiceHTML(inv)}</body></html>`);
+        win.document.close();
+        win.print();
+    };
+    window.shareInvoiceViaWhatsApp = (id) => {
+        const inv = invoices.find(i => i.id === id);
+        if (!inv) return;
+        const cust = customers.find(c => c.name === inv.customerName);
+        let phone = cust?.phone;
+        if (!phone) phone = prompt('Customer phone (2547xxxxxx):');
+        if (!phone) return;
+        const msg = `🧾 *Invoice ${inv.number}*\n👤 ${inv.customerName}\n💰 ${formatMoney(inv.total)}\n🏪 Smart Duka Pro\n🙏 Thank you!`;
+        window.open(`https://wa.me/${phone.replace(/\D/g, '')}?text=${encodeURIComponent(msg)}`, '_blank');
+    };
+    window.downloadInvoicePDF = async (id) => {
+        const inv = invoices.find(i => i.id === id);
+        if (!inv) return;
+        const tempDiv = document.createElement('div');
+        tempDiv.innerHTML = renderInvoiceHTML(inv);
+        document.body.appendChild(tempDiv);
+        await html2pdf().set({ margin: 0.5, filename: `invoice_${inv.number}.pdf` }).from(tempDiv).save();
+        document.body.removeChild(tempDiv);
+    };
+
+    // Invoice history
+    function renderInvoiceHistory() { return `<div class="card"><div class="card-header">📜 All Invoices</div><div id="invoiceListContainer"></div></div>`; }
+    function renderInvoiceListUI() {
+        const container = document.getElementById('invoiceListContainer');
+        if (!container) return;
+        container.innerHTML = invoices.slice().reverse().map(inv => `
+            <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid var(--border-subtle); padding: 0.75rem 0;">
+                <div><strong>${inv.number}</strong><br>${inv.customerName} | ${formatMoney(inv.total)}</div>
+                <div><button class="btn" onclick="window.printInvoiceById(${inv.id})">🖨️</button> <button class="btn" onclick="window.shareInvoiceViaWhatsApp(${inv.id})">📲</button></div>
+            </div>
+        `).join('');
+    }
+
+    // Inventory
+    function renderInventory() { return `<div class="card"><div class="card-header">📦 Stock Management <button class="btn btn-primary" id="addProductBtn">+ New Product</button></div><div id="productTable"></div></div>`; }
+    async function renderProductTable() {
+        const container = document.getElementById('productTable');
+        if (!container) return;
+        container.innerHTML = products.map(p => `<div style="display: flex; justify-content: space-between; padding: 0.6rem; background: var(--bg-deep); margin: 0.4rem 0; border-radius: 0.8rem;"><span><b>${p.name}</b> (${p.stock_qty} ${p.unit}) - Sell ${formatMoney(p.selling_price)}</span><button class="btn btn-outline" onclick="window.adjustStock(${p.id})">✏️ Adjust</button></div>`).join('');
+    }
+    window.adjustStock = async (id) => {
+        const prod = products.find(p => p.id === id);
+        const newQty = prompt(`Current stock: ${prod.stock_qty}. Enter new quantity:`, prod.stock_qty);
+        if (newQty !== null && !isNaN(parseFloat(newQty))) { prod.stock_qty = parseFloat(newQty); await updateStore('products', prod); await loadAllData(); renderProductTable(); showToast('Stock updated'); }
+    };
+    document.addEventListener('click', async (e) => {
+        if (e.target.id === 'addProductBtn') {
+            const name = prompt('Product name:'); const unit = prompt('Unit:'); const price = parseFloat(prompt('Selling price:')); const stock = parseFloat(prompt('Initial stock:')); const buy = parseFloat(prompt('Buy price:'));
+            if (name) await addToStore('products', { name, unit, stock_qty: stock, selling_price: price, buying_price: buy, low_threshold: 5 });
+            await loadAllData(); renderProductTable();
+        }
     });
-})();
+
+    // Customers
+    function renderCustomers() { return `<div class="card"><div class="card-header">👥 Customer Directory</div><div id="customerList"></div></div>`; }
+    function renderCustomerTable() {
+        const cont = document.getElementById('customerList');
+        if (!cont) return;
+        cont.innerHTML = customers.map(c => `<div style="padding:0.6rem; background: var(--bg-deep); border-radius: 0.8rem; margin: 0.4rem 0;">${c.name} | Balance: ${formatMoney(c.balance || 0)} <button class="btn btn-outline" onclick="window.recordPayment(${c.id})">Record Payment</button></div>`).join('');
+    }
+    window.recordPayment = async (custId) => {
+        const cust = customers.find(c => c.id === custId);
+        const amt = parseFloat(prompt(`Current balance ${formatMoney(cust.balance)}. Payment amount:`));
+        if (amt > 0) { cust.paidTotal = (cust.paidTotal || 0) + amt; cust.balance = (cust.creditTotal || 0) - cust.paidTotal; await updateStore('customers', cust); await loadAllData(); renderCustomerTable(); showToast(`Payment recorded, new balance ${formatMoney(cust.balance)}`); }
+    };
+
+    // Expenses
+    function renderExpenses() { return `<div class="card"><div class="card-header">📉 Expense Tracker <button id="addExpenseBtn" class="btn btn-primary">+ Add Expense</button></div><div id="expenseList"></div></div>`; }
+    async function attachExpenseEvents() {
+        document.getElementById('addExpenseBtn')?.addEventListener('click', async () => {
+            const desc = prompt('Description'); const amt = parseFloat(prompt('Amount (KES)'));
+            if (desc && amt) await addToStore('expenses', { description: desc, amount: amt, date: new Date().toISOString() });
+            await loadAllData(); renderExpenseList();
+        });
+        renderExpenseList();
+    }
+    async function renderExpenseList() {
+        const container = document.getElementById('expenseList');
+        if (!container) return;
+        container.innerHTML = expenses.map(e => `<div style="padding:0.5rem; border-bottom:1px solid var(--border-subtle);">${e.description}: ${formatMoney(e.amount)} (${new Date(e.date).toLocaleDateString()})</div>`).join('');
+    }
+
+    // Analytics
+    function renderAnalytics() {
+        const revenue = sales.reduce((a, b) => a + (b.totalAmount || 0), 0);
+        const cost = products.reduce((sum, p) => sum + ((p.buying_price || 0) * (p.initialStock ? 0 : 0)), 0); // simplified gross profit demo
+        const expenseTotal = expenses.reduce((a, b) => a + b.amount, 0);
+        const grossProfit = revenue * 0.3;
+        return `<div class="card"><div class="card-header">📊 Financial Summary</div><div class="grid-2"><div>💰 Total Revenue: ${formatMoney(revenue)}</div><div>📉 Expenses: ${formatMoney(expenseTotal)}</div><div>📈 Est. Gross Profit: ${formatMoney(grossProfit)}</div><div>🧾 Invoices: ${invoices.length}</div></div></div>`;
+    }
+
+    // Global helpers & init
+    window.switchModule = switchModule;
+    document.getElementById('menuToggle')?.addEventListener('click', () => document.getElementById('sidebar').classList.toggle('mobile-open'));
+
+    (async function init() {
+        await openDatabase();
+        await loadAllData();
+        await seedInitialData();
+        buildNavigation();
+        switchModule('dashboard');
+    })();
 </script>
 </body>
 </html>
