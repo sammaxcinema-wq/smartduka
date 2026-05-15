@@ -2,15 +2,15 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=yes">
-  <title>Smart Duka Pro · Enterprise POS</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=yes, viewport-fit=cover">
+  <title>Smart Duka Enterprise · Production POS</title>
   <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,300;400;500;600;700&family=Playfair+Display:ital,wght@0,400;0,500;0,600;1,400&display=swap" rel="stylesheet">
   <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
   <style>
     * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
     :root {
-      --bg: #050B08; --surface: #0E1612; --card: rgba(18,26,20,0.85); --border: rgba(255,255,255,0.06);
+      --bg: #050B08; --surface: #0E1612; --card: rgba(18, 26, 20, 0.85); --border: rgba(255,255,255,0.06);
       --gold: #C8883A; --gold-glow: #E9B96E; --emerald: #0A9167; --rose: #E54562; --blue: #4A9EDF;
       --text: #EDF2EF; --text-muted: #8BA398; --font-sans: 'Inter', system-ui; --font-serif: 'Playfair Display', serif;
       --radius: 24px; --radius-sm: 16px;
@@ -20,7 +20,7 @@
     .sidebar { width: 280px; background: rgba(8,12,10,0.95); backdrop-filter: blur(32px); border-right: 1px solid var(--border); position: fixed; height: 100vh; padding: 32px 0; z-index: 40; transition: transform 0.3s cubic-bezier(0.2,0.9,0.4,1.1); }
     .logo { padding: 0 28px 32px; border-bottom: 1px solid var(--border); font-family: var(--font-serif); font-size: 28px; letter-spacing: -0.3px; }
     .logo em { color: var(--gold); font-style: italic; }
-    .nav-item { display: flex; align-items: center; gap: 14px; padding: 14px 24px; margin: 4px 12px; border-radius: 18px; color: var(--text-muted); font-weight: 500; cursor: pointer; background: transparent; border: none; width: calc(100% - 24px); font-size: 14px; }
+    .nav-item { display: flex; align-items: center; gap: 14px; padding: 14px 24px; margin: 4px 12px; border-radius: 18px; color: var(--text-muted); font-weight: 500; cursor: pointer; transition: 0.2s; background: transparent; border: none; width: calc(100% - 24px); font-size: 14px; }
     .nav-item i { font-style: normal; font-size: 20px; width: 28px; }
     .nav-item.active { background: rgba(200,136,58,0.12); color: var(--gold-glow); }
     .main { flex: 1; margin-left: 280px; }
@@ -36,7 +36,7 @@
     .btn { border: none; border-radius: 100px; padding: 12px 24px; font-weight: 600; font-size: 14px; cursor: pointer; background: rgba(255,255,255,0.05); color: var(--text); transition: 0.2s; }
     .btn-primary { background: linear-gradient(135deg, var(--gold), #A86E28); color: #0A0600; }
     .btn-emerald { background: linear-gradient(135deg, var(--emerald), #076B4E); color: white; }
-    .btn-danger { background: linear-gradient(135deg, var(--rose), #B8293B); color: white; }
+    .btn-danger { background: linear-gradient(135deg, var(--rose), #b91c2c); color: white; }
     .modal-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.8); backdrop-filter: blur(12px); z-index: 100; display: none; align-items: center; justify-content: center; }
     .modal-overlay.on { display: flex; }
     .modal-sheet { background: #0E1612; border-radius: 32px; max-width: 500px; width: 90%; max-height: 85vh; overflow-y: auto; padding: 28px; border: 1px solid rgba(255,255,255,0.1); }
@@ -47,8 +47,8 @@
     @media (max-width: 1024px) { .bottom-nav { display: flex; } }
     .bottom-item { flex: 1; text-align: center; padding: 8px; font-size: 10px; color: var(--text-muted); background: transparent; border: none; border-radius: 28px; }
     .bottom-item.active { background: rgba(200,136,58,0.15); color: var(--gold); }
-    .flex-between { display: flex; justify-content: space-between; align-items: center; }
-    .delete-icon { cursor: pointer; color: var(--rose); font-size: 18px; margin-left: 12px; }
+    .flex-between { display: flex; justify-content: space-between; align-items: center; gap: 12px; flex-wrap: wrap; }
+    .delete-icon { cursor: pointer; color: var(--rose); font-weight: bold; margin-left: 12px; }
   </style>
 </head>
 <body>
@@ -67,39 +67,45 @@
 <div id="modal" class="modal-overlay"></div>
 
 <script>
-  // ---------- AUTH + DB (Enterprise Hardened) ----------
+  // ---------- AUTH & DB (Production hardened) ----------
   const STORAGE_USERS = 'ultra_duka_users';
   const STORAGE_SESSION = 'ultra_duka_session';
   let currentUser = null, db = null;
-  let products=[], sales=[], expenses=[], customers=[], invoices=[], customerTxns=[];
+  let products = [], sales = [], expenses = [], customers = [], invoices = [], customerTxns = [];
   let activeTab = 'dashboard';
   let saleCart = [];
   let revenueChart = null, analyticsChart = null;
 
-  const fmt = n => 'KES ' + (n||0).toLocaleString();
-  const showToast = (msg, err=false) => { let t=document.getElementById('toast'); t.textContent=msg; t.style.background=err?'var(--rose)':'var(--emerald)'; t.style.display='block'; setTimeout(()=>t.style.display='none',3000); };
-  const openModal = (html) => { let m=document.getElementById('modal'); m.innerHTML=`<div class="modal-sheet">${html}<button class="btn" style="margin-top:20px" onclick="closeModal()">Close</button></div>`; m.classList.add('on'); };
+  const fmt = n => 'KES ' + (n || 0).toLocaleString();
+  const showToast = (msg, err = false) => {
+    let t = document.getElementById('toast');
+    t.textContent = msg;
+    t.style.background = err ? 'var(--rose)' : 'var(--emerald)';
+    t.style.display = 'block';
+    setTimeout(() => t.style.display = 'none', 3000);
+  };
+  const openModal = (html) => { let m = document.getElementById('modal'); m.innerHTML = `<div class="modal-sheet">${html}<button class="btn" style="margin-top:20px" onclick="closeModal()">Close</button></div>`; m.classList.add('on'); };
   const closeModal = () => document.getElementById('modal').classList.remove('on');
   const toggleSidebar = () => document.getElementById('sidebar').classList.toggle('open');
 
   // IndexedDB per user
   function openUserDB(userId) {
-    return new Promise((res,rej) => {
-      let req = indexedDB.open(`duka_${userId}`, 5);
+    return new Promise((res, rej) => {
+      let req = indexedDB.open(`duka_${userId}`, 4);
       req.onupgradeneeded = e => {
         let d = e.target.result;
-        ['products','sales','expenses','customers','customerTransactions','invoices'].forEach(s => {
-          if(!d.objectStoreNames.contains(s)) d.createObjectStore(s, {keyPath:'id', autoIncrement:true});
+        ['products', 'sales', 'expenses', 'customers', 'customerTransactions', 'invoices'].forEach(s => {
+          if (!d.objectStoreNames.contains(s)) d.createObjectStore(s, { keyPath: 'id', autoIncrement: true });
         });
       };
       req.onsuccess = e => { db = e.target.result; res(); };
       req.onerror = rej;
     });
   }
-  const getAll = store => new Promise(r => { let tx=db.transaction(store,'readonly').objectStore(store).getAll(); tx.onsuccess=()=>r(tx.result); });
-  const addItem = (store,item) => new Promise(r => { let tx=db.transaction(store,'readwrite'), req=tx.objectStore(store).add(item); req.onsuccess=()=>r(req.result); });
-  const updateItem = (store,item) => new Promise(r => { let tx=db.transaction(store,'readwrite'), req=tx.objectStore(store).put(item); req.onsuccess=()=>r(); });
-  const deleteItem = (store,id) => new Promise(r => { let tx=db.transaction(store,'readwrite'), req=tx.objectStore(store).delete(id); req.onsuccess=()=>r(); });
+  const getAll = store => new Promise(r => { let tx = db.transaction(store, 'readonly').objectStore(store).getAll(); tx.onsuccess = () => r(tx.result); });
+  const addItem = (store, item) => new Promise(r => { let tx = db.transaction(store, 'readwrite'), req = tx.objectStore(store).add(item); req.onsuccess = () => r(req.result); });
+  const updateItem = (store, item) => new Promise(r => { let tx = db.transaction(store, 'readwrite'), req = tx.objectStore(store).put(item); req.onsuccess = () => r(); });
+  const deleteItem = (store, id) => new Promise(r => { let tx = db.transaction(store, 'readwrite'), req = tx.objectStore(store).delete(id); req.onsuccess = () => r(); });
 
   async function loadData() {
     products = await getAll('products');
@@ -111,16 +117,16 @@
   }
 
   // Auth
-  function hashPassword(pw) { let h=0; for(let i=0;i<pw.length;i++){h=((h<<5)-h)+pw.charCodeAt(i);h|=0;} return Math.abs(h).toString(16); }
-  function getUsers() { return JSON.parse(localStorage.getItem(STORAGE_USERS)||'[]'); }
+  function hashPassword(pw) { let h = 0; for (let i = 0; i < pw.length; i++) { h = ((h << 5) - h) + pw.charCodeAt(i); h |= 0; } return Math.abs(h).toString(16); }
+  function getUsers() { return JSON.parse(localStorage.getItem(STORAGE_USERS) || '[]'); }
   function saveUsers(users) { localStorage.setItem(STORAGE_USERS, JSON.stringify(users)); }
-  function findUser(email) { return getUsers().find(u=>u.email.toLowerCase()===email.toLowerCase()); }
-  function createSession(user) { let sess={userId:user.id, email:user.email, shopName:user.shopName, expires:Date.now()+7*86400000}; localStorage.setItem(STORAGE_SESSION, JSON.stringify(sess)); currentUser=user; }
-  function getSession() { let s=localStorage.getItem(STORAGE_SESSION); if(!s) return null; let sess=JSON.parse(s); if(Date.now()>sess.expires) { localStorage.removeItem(STORAGE_SESSION); return null; } return sess; }
-  async function logout() { localStorage.removeItem(STORAGE_SESSION); db=null; location.reload(); }
+  function findUser(email) { return getUsers().find(u => u.email.toLowerCase() === email.toLowerCase()); }
+  function createSession(user) { let sess = { userId: user.id, email: user.email, shopName: user.shopName, expires: Date.now() + 7 * 86400000 }; localStorage.setItem(STORAGE_SESSION, JSON.stringify(sess)); currentUser = user; }
+  function getSession() { let s = localStorage.getItem(STORAGE_SESSION); if (!s) return null; let sess = JSON.parse(s); if (Date.now() > sess.expires) { localStorage.removeItem(STORAGE_SESSION); return null; } return sess; }
+  async function logout() { localStorage.removeItem(STORAGE_SESSION); db = null; location.reload(); }
   async function login(email, password) {
     let user = findUser(email);
-    if(!user || user.passwordHash !== hashPassword(password)) throw new Error('Invalid credentials');
+    if (!user || user.passwordHash !== hashPassword(password)) throw new Error('Invalid credentials');
     createSession(user);
     await openUserDB(user.id);
     await loadData();
@@ -129,9 +135,9 @@
     await renderApp();
   }
   async function signup(shopName, email, password) {
-    if(findUser(email)) throw new Error('Email exists');
-    let userId = 'u'+Date.now()+'_'+Math.random().toString(36).substr(2,6);
-    let newUser = { id:userId, email:email.toLowerCase(), passwordHash:hashPassword(password), shopName };
+    if (findUser(email)) throw new Error('Email exists');
+    let userId = 'u' + Date.now() + '_' + Math.random().toString(36).substr(2, 6);
+    let newUser = { id: userId, email: email.toLowerCase(), passwordHash: hashPassword(password), shopName };
     let users = getUsers();
     users.push(newUser);
     saveUsers(users);
@@ -143,14 +149,14 @@
     await renderApp();
   }
   async function seedData() {
-    if(products.length===0) {
-      await addItem('products', {name:'Sugar', unit:'kg', stock_qty:120, buying_price:100, selling_price:140, low_threshold:10});
-      await addItem('products', {name:'Flour', unit:'kg', stock_qty:200, buying_price:70, selling_price:95, low_threshold:15});
-      await addItem('products', {name:'Cooking Oil', unit:'L', stock_qty:80, buying_price:210, selling_price:270, low_threshold:8});
+    if (products.length === 0) {
+      await addItem('products', { name: 'Sugar', unit: 'kg', stock_qty: 120, buying_price: 100, selling_price: 140, low_threshold: 10 });
+      await addItem('products', { name: 'Flour', unit: 'kg', stock_qty: 200, buying_price: 70, selling_price: 95, low_threshold: 15 });
+      await addItem('products', { name: 'Cooking Oil', unit: 'L', stock_qty: 80, buying_price: 210, selling_price: 270, low_threshold: 8 });
     }
-    if(customers.length===0) {
-      await addItem('customers', {name:'Jane Wanjiku', phone:'0712345678', totalSpent:0, credit:0, debit:0, balance:0});
-      await addItem('customers', {name:'Peter Omondi', phone:'0723456789', totalSpent:0, credit:0, debit:0, balance:0});
+    if (customers.length === 0) {
+      await addItem('customers', { name: 'Jane Wanjiku', phone: '0712345678', totalSpent: 0, credit: 0, debit: 0, balance: 0 });
+      await addItem('customers', { name: 'Peter Omondi', phone: '0723456789', totalSpent: 0, credit: 0, debit: 0, balance: 0 });
     }
     await loadData();
   }
@@ -158,13 +164,13 @@
   // ---------- UI Rendering ----------
   function buildNav() {
     let tabs = [
-      {id:'dashboard', icon:'📊', label:'Dashboard'},
-      {id:'sales', icon:'🛒', label:'POS'},
-      {id:'products', icon:'📦', label:'Stock'},
-      {id:'customers', icon:'👥', label:'Clients'},
-      {id:'invoices', icon:'🧾', label:'Invoices'},
-      {id:'expenses', icon:'💸', label:'Expenses'},
-      {id:'analytics', icon:'📈', label:'Analytics'}
+      { id: 'dashboard', icon: '📊', label: 'Dashboard' },
+      { id: 'sales', icon: '🛒', label: 'POS' },
+      { id: 'products', icon: '📦', label: 'Stock' },
+      { id: 'customers', icon: '👥', label: 'Clients' },
+      { id: 'invoices', icon: '🧾', label: 'Invoices' },
+      { id: 'expenses', icon: '💸', label: 'Expenses' },
+      { id: 'analytics', icon: '📈', label: 'Analytics' }
     ];
     document.getElementById('sideNav').innerHTML = tabs.map(t => `<button class="nav-item" onclick="switchTab('${t.id}')"><i>${t.icon}</i> ${t.label}</button>`).join('');
     document.getElementById('bottomNav').innerHTML = tabs.map(t => `<button class="bottom-item" onclick="switchTab('${t.id}')"><div>${t.icon}</div><div>${t.label}</div></button>`).join('');
@@ -176,71 +182,71 @@
     document.querySelector(`.nav-item[onclick="switchTab('${id}')"]`)?.classList.add('active');
     document.querySelector(`.bottom-item[onclick="switchTab('${id}')"]`)?.classList.add('active');
     renderContent();
-    if(window.innerWidth<=1024) document.getElementById('sidebar').classList.remove('open');
+    if (window.innerWidth <= 1024) document.getElementById('sidebar').classList.remove('open');
   }
 
   function renderContent() {
     let container = document.getElementById('mainContent');
-    if(activeTab === 'dashboard') container.innerHTML = renderDashboard();
-    else if(activeTab === 'sales') container.innerHTML = renderPOS();
-    else if(activeTab === 'products') container.innerHTML = renderProducts();
-    else if(activeTab === 'customers') container.innerHTML = renderCustomers();
-    else if(activeTab === 'invoices') container.innerHTML = renderInvoices();
-    else if(activeTab === 'expenses') container.innerHTML = renderExpenses();
-    else if(activeTab === 'analytics') container.innerHTML = renderAnalytics();
-    
-    if(activeTab === 'sales') attachPOSEvents();
-    if(activeTab === 'products') renderProductList();
-    if(activeTab === 'customers') { renderCustomerList(); attachCustomerSearch(); }
-    if(activeTab === 'invoices') renderInvoiceList();
-    if(activeTab === 'expenses') renderExpenseList();
-    if(activeTab === 'dashboard') setTimeout(drawCharts, 100);
-    if(activeTab === 'analytics') drawAnalyticsChart();
+    if (activeTab === 'dashboard') container.innerHTML = renderDashboard();
+    else if (activeTab === 'sales') container.innerHTML = renderPOS();
+    else if (activeTab === 'products') container.innerHTML = renderProducts();
+    else if (activeTab === 'customers') container.innerHTML = renderCustomers();
+    else if (activeTab === 'invoices') container.innerHTML = renderInvoices();
+    else if (activeTab === 'expenses') container.innerHTML = renderExpenses();
+    else if (activeTab === 'analytics') container.innerHTML = renderAnalytics();
+
+    if (activeTab === 'sales') attachPOSEvents();
+    if (activeTab === 'products') renderProductList();
+    if (activeTab === 'customers') { renderCustomerList(); attachCustomerSearch(); }
+    if (activeTab === 'invoices') renderInvoiceList();
+    if (activeTab === 'expenses') renderExpenseList();
+    if (activeTab === 'dashboard') setTimeout(drawCharts, 100);
+    if (activeTab === 'analytics') drawAnalyticsChart();
   }
 
-  // ---------- DASHBOARD with Delete Shortcuts ----------
+  // ---------- DASHBOARD ----------
   function renderDashboard() {
-    let totalRevenue = sales.reduce((a,b)=>a+b.amount,0);
-    let totalExpenses = expenses.reduce((a,b)=>a+b.amount,0);
+    let totalRevenue = sales.reduce((a, b) => a + b.amount, 0);
+    let totalExpenses = expenses.reduce((a, b) => a + b.amount, 0);
     let profit = totalRevenue - totalExpenses;
-    let todaySales = sales.filter(s => new Date(s.date).toDateString() === new Date().toDateString()).reduce((a,b)=>a+b.amount,0);
+    let todaySales = sales.filter(s => new Date(s.date).toDateString() === new Date().toDateString()).reduce((a, b) => a + b.amount, 0);
     let lowStock = products.filter(p => p.stock_qty <= p.low_threshold).length;
-    let recentSales = sales.slice().reverse().slice(0,5);
-    let topProducts = [...sales.reduce((map, s) => { map.set(s.product, (map.get(s.product)||0)+s.amount); return map; }, new Map())].sort((a,b)=>b[1]-a[1]).slice(0,3);
+    let recentSales = sales.slice().reverse().slice(0, 5);
+    let topProducts = [...sales.reduce((map, s) => { map.set(s.product, (map.get(s.product) || 0) + s.amount); return map; }, new Map())].sort((a, b) => b[1] - a[1]).slice(0, 3);
     return `
       <div class="grid-2">
         <div class="stat-card"><div>💰 Total Revenue</div><div class="stat-value">${fmt(totalRevenue)}</div></div>
         <div class="stat-card"><div>📉 Expenses</div><div class="stat-value" style="color:#E54562">${fmt(totalExpenses)}</div></div>
-        <div class="stat-card"><div>📈 Net Profit</div><div class="stat-value" style="color:${profit>=0?'var(--emerald)':'#E54562'}">${fmt(profit)}</div></div>
+        <div class="stat-card"><div>📈 Net Profit</div><div class="stat-value" style="color:${profit >= 0 ? 'var(--emerald)' : '#E54562'}">${fmt(profit)}</div></div>
         <div class="stat-card"><div>🕒 Today's Sales</div><div class="stat-value">${fmt(todaySales)}</div></div>
       </div>
       <div class="grid-2">
         <div class="card"><div class="flex-between"><h3>📅 Revenue Trend (Last 7 days)</h3></div><canvas id="revenueCanvas" height="180"></canvas></div>
-        <div class="card"><div class="flex-between"><h3>🏷️ Top Products</h3></div><div id="topProductsList">${topProducts.map(([name,amt])=>`<div style="display:flex;justify-content:space-between;padding:10px 0;border-bottom:1px solid var(--border)"><span>${name}</span><span>${fmt(amt)}</span></div>`).join('')}</div><div class="stat-card" style="margin-top:16px"><div>⚠️ Low Stock Alert</div><div class="stat-value" style="font-size:28px">${lowStock} items</div></div></div>
+        <div class="card"><div class="flex-between"><h3>🏷️ Top Products</h3></div><div id="topProductsList">${topProducts.map(([name, amt]) => `<div style="display:flex;justify-content:space-between;padding:10px 0;border-bottom:1px solid var(--border)"><span>${name}</span><span>${fmt(amt)}</span></div>`).join('')}</div><div class="stat-card" style="margin-top:16px"><div>⚠️ Low Stock Alert</div><div class="stat-value" style="font-size:28px">${lowStock} items</div></div></div>
       </div>
-      <div class="card"><h3>📋 Recent Transactions <span style="font-size:12px;color:var(--text-muted)">(click 🗑 to delete)</span></h3>${recentSales.map(s=>`<div class="flex-between" style="padding:12px 0;border-bottom:1px solid var(--border)"><span>${s.customerName||'Walk-in'} · ${s.product}</span><div><span style="margin-right:12px">${fmt(s.amount)}</span><span class="delete-icon" onclick="deleteSaleById(${s.id})">🗑</span></div></div>`).join('') || '<div>No sales yet</div>'}</div>
+      <div class="card"><h3>📋 Recent Transactions</h3>${recentSales.map(s => `<div style="display:flex;justify-content:space-between;padding:12px 0;border-bottom:1px solid var(--border)"><span>${s.customerName || 'Walk-in'} · ${s.product}</span><span>${fmt(s.amount)}</span><span style="font-size:12px">${new Date(s.date).toLocaleString()}</span><span class="delete-icon" onclick="deleteSale(${s.id})">🗑️</span></div>`).join('') || '<div>No sales yet</div>'}</div>
     `;
   }
 
   function drawCharts() {
     let canvas = document.getElementById('revenueCanvas');
-    if(!canvas) return;
-    if(revenueChart) revenueChart.destroy();
+    if (!canvas) return;
+    if (revenueChart) revenueChart.destroy();
     let last7 = [];
-    for(let i=6;i>=0;i--) { let d = new Date(); d.setDate(d.getDate()-i); last7.push(d.toLocaleDateString('en-US',{weekday:'short'})); }
-    let sales7 = last7.map((_,idx) => {
-      let d = new Date(); d.setDate(d.getDate()-(6-idx));
-      return sales.filter(s => new Date(s.date).toDateString() === d.toDateString()).reduce((a,b)=>a+b.amount,0);
+    for (let i = 6; i >= 0; i--) { let d = new Date(); d.setDate(d.getDate() - i); last7.push(d.toLocaleDateString('en-US', { weekday: 'short' })); }
+    let sales7 = last7.map((_, idx) => {
+      let d = new Date(); d.setDate(d.getDate() - (6 - idx));
+      return sales.filter(s => new Date(s.date).toDateString() === d.toDateString()).reduce((a, b) => a + b.amount, 0);
     });
     let ctx = canvas.getContext('2d');
-    revenueChart = new Chart(ctx, { type:'line', data:{ labels:last7, datasets:[{ label:'Sales (KES)', data:sales7, borderColor:'#C8883A', backgroundColor:'rgba(200,136,58,0.1)', fill:true, tension:0.3 }] }, options:{ responsive:true, maintainAspectRatio:true } });
+    revenueChart = new Chart(ctx, { type: 'line', data: { labels: last7, datasets: [{ label: 'Sales (KES)', data: sales7, borderColor: '#C8883A', backgroundColor: 'rgba(200,136,58,0.1)', fill: true, tension: 0.3 }] }, options: { responsive: true, maintainAspectRatio: true } });
   }
 
-  // ---------- POS with Cart ----------
+  // ---------- POS ----------
   function renderPOS() {
-    if(!products.length) return '<div class="card">Loading products...</div>';
+    if (!products.length) return '<div class="card">Loading products...</div>';
     return `<div class="card"><h3>🛒 Point of Sale</h3>
-      <div class="flex-between" style="margin:16px 0;flex-wrap:wrap;gap:8px"><input id="posCustomer" placeholder="Customer name" class="btn" style="flex:1;background:var(--surface);border:1px solid var(--border);border-radius:40px;padding:12px"><select id="posProductSelect" style="background:var(--surface);border:1px solid var(--border);border-radius:40px;padding:12px;min-width:140px">${products.map(p=>`<option value="${p.id}">${p.name} (${p.stock_qty} ${p.unit}) - ${fmt(p.selling_price)}</option>`)}</select><input id="posQty" type="number" value="1" style="width:80px;background:var(--surface);border-radius:40px;padding:12px;border:1px solid var(--border)"><button class="btn btn-primary" id="addToCartBtn">+ Add</button></div>
+      <div class="flex-between" style="margin:16px 0;"><input id="posCustomer" placeholder="Customer name" class="btn" style="flex:1;background:var(--surface);border:1px solid var(--border);border-radius:40px;padding:12px"><select id="posProductSelect" style="background:var(--surface);border:1px solid var(--border);border-radius:40px;padding:12px;min-width:140px">${products.map(p => `<option value="${p.id}">${p.name} (${p.stock_qty} ${p.unit}) - ${fmt(p.selling_price)}</option>`)}</select><input id="posQty" type="number" value="1" style="width:80px;background:var(--surface);border-radius:40px;padding:12px;border:1px solid var(--border)"><button class="btn btn-primary" id="addToCartBtn">+ Add</button></div>
       <div id="cartItems" class="card" style="margin:16px 0;background:rgba(0,0,0,0.3)"></div>
       <div class="flex-between"><h4>Total: <span id="cartTotal">KES 0</span></h4><select id="payMethodSelect" style="background:var(--surface);border-radius:40px;padding:10px"><option value="cash">Cash</option><option value="mpesa">M-Pesa</option><option value="credit">Credit</option></select><button class="btn btn-emerald" id="completeSaleBtn">✅ Complete Sale & Invoice</button></div>
       <div id="invoicePreview" class="invoice-preview" style="margin-top:24px;display:none"></div></div>`;
@@ -250,37 +256,37 @@
     document.getElementById('addToCartBtn')?.addEventListener('click', () => {
       let pid = parseInt(document.getElementById('posProductSelect').value);
       let qty = parseFloat(document.getElementById('posQty').value) || 1;
-      let prod = products.find(p=>p.id===pid);
-      if(!prod) return showToast('Product error', true);
-      if(prod.stock_qty < qty) return showToast(`Only ${prod.stock_qty} left`, true);
-      let existing = saleCart.find(i=>i.id===pid);
-      if(existing) existing.qty += qty;
-      else saleCart.push({id:pid, name:prod.name, qty, price:prod.selling_price, unit:prod.unit});
+      let prod = products.find(p => p.id === pid);
+      if (!prod) return showToast('Product error', true);
+      if (prod.stock_qty < qty) return showToast(`Only ${prod.stock_qty} left`, true);
+      let existing = saleCart.find(i => i.id === pid);
+      if (existing) existing.qty += qty;
+      else saleCart.push({ id: pid, name: prod.name, qty, price: prod.selling_price, unit: prod.unit });
       updateCartUI();
     });
     document.getElementById('completeSaleBtn')?.addEventListener('click', async () => {
       let customerName = document.getElementById('posCustomer').value.trim();
-      if(!customerName) return showToast('Customer name required', true);
-      if(saleCart.length===0) return showToast('Cart empty', true);
+      if (!customerName) return showToast('Customer name required', true);
+      if (saleCart.length === 0) return showToast('Cart empty', true);
       let method = document.getElementById('payMethodSelect').value;
-      let total = saleCart.reduce((s,i)=>s + i.qty*i.price, 0);
-      for(let item of saleCart) {
-        let prod = products.find(p=>p.id===item.id);
-        if(prod) { prod.stock_qty -= item.qty; await updateItem('products', prod); }
+      let total = saleCart.reduce((s, i) => s + i.qty * i.price, 0);
+      for (let item of saleCart) {
+        let prod = products.find(p => p.id === item.id);
+        if (prod) { prod.stock_qty -= item.qty; await updateItem('products', prod); }
       }
-      let cust = customers.find(c=>c.name.toLowerCase()===customerName.toLowerCase());
-      if(!cust) { let cid = await addItem('customers', {name:customerName, phone:'', totalSpent:0, credit:0, debit:0, balance:0}); cust = {id:cid, name:customerName, totalSpent:0, credit:0, debit:0, balance:0}; customers.push(cust); }
-      if(method === 'credit') { cust.credit += total; cust.balance = cust.credit - cust.debit; await updateItem('customers', cust); }
-      cust.totalSpent = (cust.totalSpent||0) + total;
+      let cust = customers.find(c => c.name.toLowerCase() === customerName.toLowerCase());
+      if (!cust) { let cid = await addItem('customers', { name: customerName, phone: '', totalSpent: 0, credit: 0, debit: 0, balance: 0 }); cust = { id: cid, name: customerName, totalSpent: 0, credit: 0, debit: 0, balance: 0 }; customers.push(cust); }
+      if (method === 'credit') { cust.credit += total; cust.balance = cust.credit - cust.debit; await updateItem('customers', cust); }
+      cust.totalSpent = (cust.totalSpent || 0) + total;
       await updateItem('customers', cust);
-      let saleObj = { customerName, items: saleCart.map(i=>({name:i.name, qty:i.qty, price:i.price})), amount:total, product: saleCart.map(i=>i.name).join(', '), method, date:new Date().toISOString() };
+      let saleObj = { customerName, items: saleCart.map(i => ({ name: i.name, qty: i.qty, price: i.price })), amount: total, product: saleCart.map(i => i.name).join(', '), method, date: new Date().toISOString() };
       let saleId = await addItem('sales', saleObj);
-      let invNumber = `INV-${new Date().getFullYear()}-${String(invoices.length+1).padStart(5,'0')}`;
-      let inv = { number: invNumber, saleId, customerName, items: saleCart.map(i=>({name:i.name, qty:i.qty, price:i.price, unit:i.unit})), total, method, date:new Date().toISOString(), shopName: currentUser?.shopName || 'Smart Duka' };
+      let invNumber = `INV-${new Date().getFullYear()}-${String(invoices.length + 1).padStart(5, '0')}`;
+      let inv = { number: invNumber, saleId, customerName, items: saleCart.map(i => ({ name: i.name, qty: i.qty, price: i.price, unit: i.unit })), total, method, date: new Date().toISOString(), shopName: currentUser?.shopName || 'Smart Duka' };
       let invId = await addItem('invoices', inv);
       invoices.push(inv);
-      if(method === 'credit') await addItem('customerTransactions', { customerId:cust.id, type:'credit', amount:total, note:`Sale: ${saleCart.map(i=>i.name).join(', ')}`, date:new Date().toISOString() });
-      else await addItem('customerTransactions', { customerId:cust.id, type:'debit', amount:total, note:`Sale: ${saleCart.map(i=>i.name).join(', ')}`, date:new Date().toISOString() });
+      if (method === 'credit') await addItem('customerTransactions', { customerId: cust.id, type: 'credit', amount: total, note: `Sale: ${saleCart.map(i => i.name).join(', ')}`, date: new Date().toISOString() });
+      else await addItem('customerTransactions', { customerId: cust.id, type: 'debit', amount: total, note: `Sale: ${saleCart.map(i => i.name).join(', ')}`, date: new Date().toISOString() });
       showToast(`Invoice ${invNumber} created`);
       let previewDiv = document.getElementById('invoicePreview');
       previewDiv.style.display = 'block';
@@ -289,174 +295,171 @@
       updateCartUI();
       document.getElementById('posCustomer').value = '';
       await loadData();
-      if(activeTab === 'dashboard') renderContent(); // refresh dashboard after sale
+      renderContent(); // refresh lists
     });
   }
 
   function updateCartUI() {
     let cartDiv = document.getElementById('cartItems');
-    if(!cartDiv) return;
-    let total = saleCart.reduce((s,i)=>s + i.qty*i.price,0);
-    cartDiv.innerHTML = saleCart.map((item,idx) => `<div class="flex-between" style="margin:8px 0"><span>${item.name} x${item.qty} ${item.unit}</span><span>${fmt(item.qty*item.price)}</span><button class="btn" onclick="window.removeCartItem(${idx})">✖</button></div>`).join('');
+    if (!cartDiv) return;
+    let total = saleCart.reduce((s, i) => s + i.qty * i.price, 0);
+    cartDiv.innerHTML = saleCart.map((item, idx) => `<div class="flex-between" style="margin:8px 0"><span>${item.name} x${item.qty} ${item.unit}</span><span>${fmt(item.qty * item.price)}</span><button class="btn" onclick="window.removeCartItem(${idx})">✖</button></div>`).join('');
     document.getElementById('cartTotal').innerText = fmt(total);
   }
-  window.removeCartItem = (idx) => { saleCart.splice(idx,1); updateCartUI(); };
+  window.removeCartItem = (idx) => { saleCart.splice(idx, 1); updateCartUI(); };
 
   function renderInvoiceHTML(inv) {
-    let itemsHtml = inv.items.map(i => `<tr><td>${i.name}</td><td>${i.qty} ${i.unit||''}</td><td>${fmt(i.price)}</td>`).join('');
+    let itemsHtml = inv.items.map(i => `<tr><td>${i.name}</td><td>${i.qty} ${i.unit || ''}</td><td>${fmt(i.price)}</td>`).join('');
     return `<div style="font-family:monospace;background:white;color:#111;padding:20px;border-radius:16px;max-width:380px;margin:auto"><h3 style="text-align:center">${inv.shopName}</h3><p style="text-align:center">${inv.number} | ${new Date(inv.date).toLocaleString()}</p><hr><p><b>Customer:</b> ${inv.customerName}</p><table style="width:100%;margin:12px 0"><thead><tr><th>Item</th><th>Qty</th><th>Price</th></tr></thead><tbody>${itemsHtml}</tbody></table><hr><p><b>Total:</b> ${fmt(inv.total)} | <b>Method:</b> ${inv.method}</p><p style="text-align:center">Asante Sana!</p></div>`;
   }
   window.printInvoice = async (id) => {
-    let inv = invoices.find(i=>i.id===id);
-    if(!inv) return;
-    let win = window.open('','_blank','width=450,height=600');
+    let inv = invoices.find(i => i.id === id);
+    if (!inv) return;
+    let win = window.open('', '_blank', 'width=450,height=600');
     win.document.write(`<html><head><title>Invoice ${inv.number}</title><style>body{font-family:monospace}</style></head><body>${renderInvoiceHTML(inv)}</body></html>`);
     win.document.close();
     win.print();
   };
   window.downloadInvoicePDF = async (id) => {
-    let inv = invoices.find(i=>i.id===id);
-    if(!inv) return;
+    let inv = invoices.find(i => i.id === id);
+    if (!inv) return;
     let div = document.createElement('div'); div.innerHTML = renderInvoiceHTML(inv);
     document.body.appendChild(div);
-    await html2pdf().set({margin:0.5, filename:`invoice-${inv.number}.pdf`}).from(div).save();
+    await html2pdf().set({ margin: 0.5, filename: `invoice-${inv.number}.pdf` }).from(div).save();
     document.body.removeChild(div);
   };
 
-  // ---------- DELETE LOGIC (Complete with integrity) ----------
-  window.deleteSaleById = async (saleId) => {
-    if(!confirm('⚠️ Delete this sale? Stock and customer balance will be restored.')) return;
-    let sale = sales.find(s=>s.id===saleId);
-    if(!sale) return showToast('Sale not found', true);
-    // revert stock
-    if(sale.items && sale.items.length) {
-      for(let item of sale.items) {
-        let prod = products.find(p=>p.name === item.name);
-        if(prod) { prod.stock_qty += item.qty; await updateItem('products', prod); }
+  // ---------- DELETE LOGIC (Atomic + Cascade) ----------
+  window.deleteSale = async (id) => {
+    if (!confirm('⚠️ Delete this sale? Stock will be restored and customer balance adjusted.')) return;
+    let sale = sales.find(s => s.id === id);
+    if (!sale) return;
+    // restore stock
+    if (sale.items && sale.items.length) {
+      for (let item of sale.items) {
+        let prod = products.find(p => p.name === item.name);
+        if (prod) { prod.stock_qty += item.qty; await updateItem('products', prod); }
       }
+    } else if (sale.product) {
+      let prod = products.find(p => p.name === sale.product);
+      if (prod) { prod.stock_qty += sale.qty || 1; await updateItem('products', prod); }
     }
-    // revert customer balance if credit sale
-    if(sale.customerName) {
-      let cust = customers.find(c=>c.name.toLowerCase()===sale.customerName.toLowerCase());
-      if(cust) {
-        if(sale.method === 'credit') { cust.credit -= sale.amount; cust.balance = cust.credit - cust.debit; await updateItem('customers', cust); }
-        cust.totalSpent = Math.max(0, (cust.totalSpent||0) - sale.amount);
-        await updateItem('customers', cust);
-        // remove related transaction
-        let relatedTxn = customerTxns.find(t=>t.customerId===cust.id && t.amount===sale.amount && t.note?.includes(sale.product));
-        if(relatedTxn) await deleteItem('customerTransactions', relatedTxn.id);
-      }
+    // adjust customer balance
+    let cust = customers.find(c => c.name === sale.customerName);
+    if (cust) {
+      if (sale.method === 'credit') { cust.credit -= sale.amount; cust.balance = cust.credit - cust.debit; }
+      cust.totalSpent = Math.max(0, (cust.totalSpent || 0) - sale.amount);
+      await updateItem('customers', cust);
+      // remove related transaction
+      let txn = customerTxns.find(t => t.customerId === cust.id && Math.abs(t.amount - sale.amount) < 0.01 && new Date(t.date).toDateString() === new Date(sale.date).toDateString());
+      if (txn) await deleteItem('customerTransactions', txn.id);
     }
-    // delete associated invoice
-    let inv = invoices.find(i=>i.saleId === saleId);
-    if(inv) { await deleteItem('invoices', inv.id); invoices = invoices.filter(i=>i.id!==inv.id); }
-    await deleteItem('sales', saleId);
+    // delete invoice
+    let inv = invoices.find(i => i.saleId === id);
+    if (inv) await deleteItem('invoices', inv.id);
+    await deleteItem('sales', id);
     await loadData();
     renderContent();
-    showToast('Sale and invoice deleted successfully');
+    showToast('Sale deleted & stock restored');
   };
 
-  // Products delete with stock safety
-  window.deleteProd = async (id) => { if(confirm('Delete product? This will not affect past sales.')){ await deleteItem('products',id); await loadData(); renderProductList(); } };
-  // Expenses delete
-  window.deleteExpenseItem = async (id) => { if(confirm('Delete expense?')){ await deleteItem('expenses',id); await loadData(); renderExpenseList(); } };
-  // Customer delete with cascade
+  window.deleteProduct = async (id) => {
+    if (!confirm('Delete product? This will NOT affect past sales.')) return;
+    await deleteItem('products', id);
+    await loadData();
+    renderProductList();
+    showToast('Product deleted');
+  };
+
   window.deleteCustomer = async (id) => {
-    if(!confirm('⚠️ Delete this customer? All their transactions and associated sales will also be removed (cannot undo).')) return;
-    let cust = customers.find(c=>c.id===id);
-    if(!cust) return;
-    // delete all customer transactions
-    let txns = customerTxns.filter(t=>t.customerId===id);
-    for(let t of txns) await deleteItem('customerTransactions', t.id);
-    // delete all sales for this customer and revert stock
-    let custSales = sales.filter(s=>s.customerName?.toLowerCase()===cust.name.toLowerCase());
-    for(let sale of custSales) {
-      if(sale.items) for(let item of sale.items) {
-        let prod = products.find(p=>p.name===item.name);
-        if(prod) { prod.stock_qty += item.qty; await updateItem('products', prod); }
-      }
-      let inv = invoices.find(i=>i.saleId===sale.id);
-      if(inv) await deleteItem('invoices', inv.id);
-      await deleteItem('sales', sale.id);
-    }
+    if (!confirm('⚠️ Delete customer and ALL their transaction history? This cannot be undone.')) return;
+    let txns = customerTxns.filter(t => t.customerId === id);
+    for (let t of txns) await deleteItem('customerTransactions', t.id);
     await deleteItem('customers', id);
     await loadData();
-    renderContent();
-    showToast(`Customer ${cust.name} deleted with all records`);
+    renderCustomerList();
+    showToast('Customer removed');
   };
-  // Invoice delete
+
+  window.deleteExpense = async (id) => {
+    if (!confirm('Delete expense?')) return;
+    await deleteItem('expenses', id);
+    await loadData();
+    renderExpenseList();
+    showToast('Expense deleted');
+  };
+
   window.deleteInvoice = async (id) => {
-    if(confirm('Delete invoice? This does NOT affect sales or stock.')){
-      await deleteItem('invoices', id);
-      await loadData();
-      renderInvoiceList();
-      showToast('Invoice deleted');
-    }
+    if (!confirm('Delete invoice? Sale remains intact.')) return;
+    await deleteItem('invoices', id);
+    await loadData();
+    renderInvoiceList();
+    showToast('Invoice deleted');
   };
 
-  // Products UI
+  // Products
   function renderProducts() { return `<div class="card"><div class="flex-between"><h3>📦 Inventory</h3><button class="btn btn-primary" onclick="openAddProduct()">+ Add Product</button></div><div id="productList"></div></div>`; }
-  function renderProductList() { let list=document.getElementById('productList'); if(!list)return; list.innerHTML=products.map(p=>`<div class="flex-between" style="padding:12px 0;border-bottom:1px solid var(--border)"><div><b>${p.name}</b> (${p.unit})<br>Stock: ${p.stock_qty} | Sell: ${fmt(p.selling_price)}</div><div><button class="btn" onclick="restockProd(${p.id})">Restock</button><button class="btn btn-danger" onclick="deleteProd(${p.id})">Delete</button></div></div>`).join(''); }
-  window.openAddProduct = () => { openModal(`<h3>New Product</h3><input id="prodName" placeholder="Name" class="btn" style="width:100%;margin:8px 0"><input id="prodUnit" placeholder="Unit" class="btn" style="width:100%"><input id="prodStock" type="number" placeholder="Stock" class="btn"><input id="prodBuy" type="number" placeholder="Buy Price" class="btn"><input id="prodSell" type="number" placeholder="Sell Price" class="btn"><button class="btn btn-primary" onclick="saveProduct()">Save</button>`); };
-  window.saveProduct = async () => { let name=document.getElementById('prodName')?.value, unit=document.getElementById('prodUnit')?.value, stock=parseFloat(document.getElementById('prodStock')?.value), buy=parseFloat(document.getElementById('prodBuy')?.value), sell=parseFloat(document.getElementById('prodSell')?.value); if(name){ await addItem('products',{name,unit,stock_qty:stock,buying_price:buy,selling_price:sell,low_threshold:Math.max(5,stock*0.1)}); await loadData(); renderProductList(); closeModal(); } };
-  window.restockProd = async (id) => { let p=products.find(p=>p.id===id); if(!p) return; let add=parseFloat(prompt(`Add stock to ${p.name}:`)); if(add>0){ p.stock_qty+=add; await updateItem('products',p); await loadData(); renderProductList(); } };
+  function renderProductList() { let list = document.getElementById('productList'); if (!list) return; list.innerHTML = products.map(p => `<div class="flex-between" style="padding:12px 0;border-bottom:1px solid var(--border)"><div><b>${p.name}</b> (${p.unit})<br>Stock: ${p.stock_qty} | Sell: ${fmt(p.selling_price)}</div><div><button class="btn" onclick="restockProd(${p.id})">Restock</button><button class="btn btn-danger" onclick="deleteProduct(${p.id})">Delete</button></div></div>`).join(''); }
+  window.openAddProduct = () => { openModal(`<h3>New Product</h3><input id="prodName" placeholder="Name" class="btn" style="width:100%;margin:8px 0"><input id="prodUnit" placeholder="Unit (kg/L/pcs)" class="btn" style="width:100%"><input id="prodStock" type="number" placeholder="Stock" class="btn"><input id="prodBuy" type="number" placeholder="Buy Price" class="btn"><input id="prodSell" type="number" placeholder="Sell Price" class="btn"><button class="btn btn-primary" onclick="saveProduct()">Save</button>`); };
+  window.saveProduct = async () => { let name = document.getElementById('prodName')?.value, unit = document.getElementById('prodUnit')?.value, stock = parseFloat(document.getElementById('prodStock')?.value), buy = parseFloat(document.getElementById('prodBuy')?.value), sell = parseFloat(document.getElementById('prodSell')?.value); if (name) { await addItem('products', { name, unit, stock_qty: stock, buying_price: buy, selling_price: sell, low_threshold: Math.max(5, stock * 0.1) }); await loadData(); renderProductList(); closeModal(); } };
+  window.restockProd = async (id) => { let p = products.find(p => p.id === id); if (!p) return; let add = parseFloat(prompt(`Add stock to ${p.name}:`)); if (add > 0) { p.stock_qty += add; await updateItem('products', p); await loadData(); renderProductList(); } };
 
-  // Customers with delete
+  // Customers
   function renderCustomers() { return `<div class="card"><div class="flex-between"><h3>👥 Clients</h3><button class="btn btn-primary" onclick="openAddCustomer()">+ Add Client</button></div><input id="custSearch" placeholder="Search name or phone..." style="margin:16px 0;padding:12px;background:var(--surface);border-radius:40px;border:1px solid var(--border);width:100%"><div id="customersList"></div></div>`; }
-  function attachCustomerSearch() { let inp = document.getElementById('custSearch'); if(inp) inp.addEventListener('input', () => renderCustomerList()); }
-  function renderCustomerList() { let listDiv=document.getElementById('customersList'); if(!listDiv) return; let search=document.getElementById('custSearch')?.value.toLowerCase()||''; let filtered=customers.filter(c=>c.name.toLowerCase().includes(search)||(c.phone||'').includes(search)); listDiv.innerHTML=filtered.map(c=>`<div class="flex-between" style="padding:12px 0;border-bottom:1px solid var(--border)"><div><b>${c.name}</b><br>${c.phone||'—'} | Balance: ${fmt(c.balance||0)}</div><div><button class="btn" onclick="viewCustomerTxns(${c.id})">History</button><button class="btn btn-emerald" onclick="recordPaymentPrompt(${c.id})">Pay</button><button class="btn btn-danger" onclick="deleteCustomer(${c.id})">Delete</button></div></div>`).join(''); }
+  function attachCustomerSearch() { let inp = document.getElementById('custSearch'); if (inp) inp.addEventListener('input', () => renderCustomerList()); }
+  function renderCustomerList() { let listDiv = document.getElementById('customersList'); if (!listDiv) return; let search = document.getElementById('custSearch')?.value.toLowerCase() || ''; let filtered = customers.filter(c => c.name.toLowerCase().includes(search) || (c.phone || '').includes(search)); listDiv.innerHTML = filtered.map(c => `<div class="flex-between" style="padding:12px 0;border-bottom:1px solid var(--border)"><div><b>${c.name}</b><br>${c.phone || '—'} | Balance: ${fmt(c.balance || 0)}</div><div><button class="btn" onclick="viewCustomerTxns(${c.id})">History</button><button class="btn btn-emerald" onclick="recordPaymentPrompt(${c.id})">Pay</button><button class="btn btn-danger" onclick="deleteCustomer(${c.id})">Delete</button></div></div>`).join(''); }
   window.openAddCustomer = () => { openModal(`<h3>Add Client</h3><input id="custName" placeholder="Full name" class="btn" style="width:100%;margin:8px 0"><input id="custPhone" placeholder="Phone" class="btn"><button class="btn btn-primary" onclick="saveCustomer()">Save</button>`); };
-  window.saveCustomer = async () => { let name=document.getElementById('custName')?.value.trim(), phone=document.getElementById('custPhone')?.value.trim(); if(!name) return; await addItem('customers',{name,phone,totalSpent:0,credit:0,debit:0,balance:0}); await loadData(); renderCustomerList(); closeModal(); };
-  window.recordPaymentPrompt = (id) => { let cust=customers.find(c=>c.id===id); openModal(`<h3>Payment - ${cust.name}</h3><div>Balance: ${fmt(cust.balance||0)}</div><input id="payAmount" type="number" placeholder="Amount" class="btn" style="width:100%;margin:12px 0"><button class="btn btn-emerald" onclick="recordPayment(${id})">Submit</button>`); };
-  window.recordPayment = async (id) => { let amt=parseFloat(document.getElementById('payAmount')?.value); if(!amt||amt<=0) return; let cust=customers.find(c=>c.id===id); let actual=Math.min(amt, cust.balance||0); if(actual<=0) return showToast('No debt',true); cust.debit=(cust.debit||0)+actual; cust.balance=(cust.credit||0)-cust.debit; await updateItem('customers',cust); await addItem('customerTransactions',{customerId:id,type:'debit',amount:actual,note:'Payment received',date:new Date().toISOString()}); await loadData(); renderCustomerList(); closeModal(); showToast(`Payment of ${fmt(actual)} recorded`); };
-  window.viewCustomerTxns = (id) => { let txns=customerTxns.filter(t=>t.customerId===id).sort((a,b)=>new Date(b.date)-new Date(a.date)); openModal(`<h3>Transaction History</h3>${txns.map(t=>`<div class="flex-between" style="padding:8px 0"><span>${new Date(t.date).toLocaleDateString()} ${t.note||''}</span><span style="color:${t.type==='credit'?'#E54562':'var(--emerald)'}">${t.type==='credit'?'+':'-'} ${fmt(t.amount)}</span></div>`).join('')||'No transactions'}`); };
+  window.saveCustomer = async () => { let name = document.getElementById('custName')?.value.trim(), phone = document.getElementById('custPhone')?.value.trim(); if (!name) return; await addItem('customers', { name, phone, totalSpent: 0, credit: 0, debit: 0, balance: 0 }); await loadData(); renderCustomerList(); closeModal(); };
+  window.recordPaymentPrompt = (id) => { let cust = customers.find(c => c.id === id); openModal(`<h3>Payment - ${cust.name}</h3><div>Balance: ${fmt(cust.balance || 0)}</div><input id="payAmount" type="number" placeholder="Amount" class="btn" style="width:100%;margin:12px 0"><button class="btn btn-emerald" onclick="recordPayment(${id})">Submit</button>`); };
+  window.recordPayment = async (id) => { let amt = parseFloat(document.getElementById('payAmount')?.value); if (!amt || amt <= 0) return; let cust = customers.find(c => c.id === id); let actual = Math.min(amt, cust.balance || 0); if (actual <= 0) return showToast('No debt', true); cust.debit = (cust.debit || 0) + actual; cust.balance = (cust.credit || 0) - cust.debit; await updateItem('customers', cust); await addItem('customerTransactions', { customerId: id, type: 'debit', amount: actual, note: 'Payment received', date: new Date().toISOString() }); await loadData(); renderCustomerList(); closeModal(); showToast(`Payment of ${fmt(actual)} recorded`); };
+  window.viewCustomerTxns = (id) => { let txns = customerTxns.filter(t => t.customerId === id).sort((a, b) => new Date(b.date) - new Date(a.date)); openModal(`<h3>Transaction History</h3>${txns.map(t => `<div class="flex-between" style="padding:8px 0"><span>${new Date(t.date).toLocaleDateString()} ${t.note || ''}</span><span style="color:${t.type === 'credit' ? '#E54562' : 'var(--emerald)'}">${t.type === 'credit' ? '+' : '-'} ${fmt(t.amount)}</span></div>`).join('') || 'No transactions'}`); };
 
-  // Invoices with delete
+  // Invoices
   function renderInvoices() { return `<div class="card"><h3>🧾 Invoices</h3><div id="invoiceHistory"></div></div>`; }
-  function renderInvoiceList() { let listDiv=document.getElementById('invoiceHistory'); if(!listDiv)return; listDiv.innerHTML=invoices.slice().reverse().map(inv=>`<div class="flex-between" style="padding:12px 0;border-bottom:1px solid var(--border)"><div><b>${inv.number}</b><br>${inv.customerName} | ${fmt(inv.total)}</div><div><button class="btn" onclick="viewInvoiceModal(${inv.id})">View</button><button class="btn btn-danger" onclick="deleteInvoice(${inv.id})">Delete</button></div></div>`).join(''); }
-  window.viewInvoiceModal = (id) => { let inv=invoices.find(i=>i.id===id); if(inv) openModal(renderInvoiceHTML(inv)+`<div class="flex-between" style="margin-top:16px"><button class="btn btn-primary" onclick="printInvoice(${id})">Print</button><button class="btn" onclick="downloadInvoicePDF(${id})">PDF</button></div>`); };
+  function renderInvoiceList() { let listDiv = document.getElementById('invoiceHistory'); if (!listDiv) return; listDiv.innerHTML = invoices.slice().reverse().map(inv => `<div class="flex-between" style="padding:12px 0;border-bottom:1px solid var(--border)"><div><b>${inv.number}</b><br>${inv.customerName} | ${fmt(inv.total)}</div><div><button class="btn" onclick="viewInvoiceModal(${inv.id})">View</button><button class="btn btn-danger" onclick="deleteInvoice(${inv.id})">Delete</button></div></div>`).join(''); }
+  window.viewInvoiceModal = (id) => { let inv = invoices.find(i => i.id === id); if (inv) openModal(renderInvoiceHTML(inv) + `<div class="flex-between" style="margin-top:16px"><button class="btn btn-primary" onclick="printInvoice(${id})">Print</button><button class="btn" onclick="downloadInvoicePDF(${id})">PDF</button></div>`); };
 
   // Expenses
   function renderExpenses() { return `<div class="card"><div class="flex-between"><h3>💸 Expenses</h3><button class="btn btn-primary" onclick="openAddExpense()">+ Add</button></div><div id="expensesList"></div></div>`; }
-  function renderExpenseList() { let list=document.getElementById('expensesList'); if(!list)return; list.innerHTML=expenses.map(e=>`<div class="flex-between" style="padding:10px 0;border-bottom:1px solid var(--border)"><span>${e.title}</span><span>${fmt(e.amount)}</span><button class="btn btn-danger" onclick="deleteExpenseItem(${e.id})">Delete</button></div>`).join(''); }
+  function renderExpenseList() { let list = document.getElementById('expensesList'); if (!list) return; list.innerHTML = expenses.map(e => `<div class="flex-between" style="padding:10px 0;border-bottom:1px solid var(--border)"><span>${e.title}</span><span>${fmt(e.amount)}</span><button class="btn btn-danger" onclick="deleteExpense(${e.id})">Delete</button></div>`).join(''); }
   window.openAddExpense = () => { openModal(`<h3>Add Expense</h3><input id="expTitle" placeholder="Title" class="btn" style="width:100%;margin:8px 0"><input id="expAmount" type="number" placeholder="Amount" class="btn"><button class="btn btn-primary" onclick="saveExpense()">Save</button>`); };
-  window.saveExpense = async () => { let title=document.getElementById('expTitle')?.value, amt=parseFloat(document.getElementById('expAmount')?.value); if(title&&amt){ await addItem('expenses',{title,amount:amt,date:new Date().toISOString()}); await loadData(); renderExpenseList(); closeModal(); } };
+  window.saveExpense = async () => { let title = document.getElementById('expTitle')?.value, amt = parseFloat(document.getElementById('expAmount')?.value); if (title && amt) { await addItem('expenses', { title, amount: amt, date: new Date().toISOString() }); await loadData(); renderExpenseList(); closeModal(); } };
 
   // Analytics
   function renderAnalytics() { return `<div class="card"><h3>📊 Sales Analytics (Last 30 Days)</h3><canvas id="analyticsChart" height="200"></canvas><div id="insights"></div></div>`; }
   function drawAnalyticsChart() {
     let canvas = document.getElementById('analyticsChart');
-    if(!canvas) return;
-    if(analyticsChart) analyticsChart.destroy();
+    if (!canvas) return;
+    if (analyticsChart) analyticsChart.destroy();
     let last30 = Array(30).fill(0);
-    sales.forEach(s=>{ let diff=Math.floor((new Date()-new Date(s.date))/86400000); if(diff<30) last30[29-diff]+=s.amount; });
+    sales.forEach(s => { let diff = Math.floor((new Date() - new Date(s.date)) / 86400000); if (diff < 30) last30[29 - diff] += s.amount; });
     let ctx = canvas.getContext('2d');
-    analyticsChart = new Chart(ctx,{type:'bar',data:{labels:Array(30).fill().map((_,i)=>`Day ${i+1}`),datasets:[{label:'Sales (KES)',data:last30,backgroundColor:'#C8883A'}]}});
-    document.getElementById('insights').innerHTML = `<div class="stat-card"><div>📈 Peak Day: ${fmt(Math.max(...last30))}</div><div>💰 Total: ${fmt(sales.reduce((a,b)=>a+b.amount,0))}</div></div>`;
+    analyticsChart = new Chart(ctx, { type: 'bar', data: { labels: Array(30).fill().map((_, i) => `Day ${i + 1}`), datasets: [{ label: 'Sales (KES)', data: last30, backgroundColor: '#C8883A' }] } });
+    document.getElementById('insights').innerHTML = `<div class="stat-card"><div>📈 Peak Day: ${fmt(Math.max(...last30))}</div><div>💰 Total: ${fmt(sales.reduce((a, b) => a + b.amount, 0))}</div></div>`;
   }
 
   async function renderApp() { buildNav(); await loadData(); renderContent(); }
 
-  // INIT
+  // ---------- Auth Init ----------
   (async function init() {
     let sess = getSession();
-    if(sess) {
+    if (sess) {
       try {
-        currentUser = { id:sess.userId, email:sess.email, shopName:sess.shopName };
+        currentUser = { id: sess.userId, email: sess.email, shopName: sess.shopName };
         await openUserDB(sess.userId);
         await loadData();
         await seedData();
         document.getElementById('app').style.display = 'flex';
         await renderApp();
-      } catch(e) { console.error(e); logout(); }
+      } catch (e) { console.error(e); logout(); }
     } else {
       document.getElementById('app').style.display = 'none';
       let authHtml = `<div style="position:fixed;inset:0;background:#050B08;display:flex;align-items:center;justify-content:center;z-index:200"><div class="card" style="max-width:380px;width:90%;text-align:center"><div style="font-family:var(--font-serif);font-size:36px">Smart <em style="color:var(--gold)">Duka</em></div><input id="authEmail" placeholder="Email" class="btn" style="width:100%;margin:16px 0;background:rgba(255,255,255,0.05)"><input id="authPass" type="password" placeholder="Password" class="btn" style="width:100%"><input id="authShop" placeholder="Shop Name (signup)" class="btn" style="width:100%;margin:12px 0;display:none"><div class="flex-between" style="gap:12px;margin-top:16px"><button id="authLoginBtn" class="btn btn-primary" style="flex:1">Login</button><button id="authSignupBtn" class="btn" style="flex:1">Sign Up</button></div></div></div>`;
       document.body.insertAdjacentHTML('beforeend', authHtml);
       let loginBtn = document.getElementById('authLoginBtn'), signupBtn = document.getElementById('authSignupBtn');
       let shopField = document.getElementById('authShop');
-      loginBtn.onclick = async () => { let email=document.getElementById('authEmail').value, pwd=document.getElementById('authPass').value; try{ await login(email,pwd); location.reload(); }catch(e){ alert(e.message); } };
-      signupBtn.onclick = async () => { let email=document.getElementById('authEmail').value, pwd=document.getElementById('authPass').value, shop=shopField.value; if(!shop) { shopField.style.display='block'; shopField.focus(); return; } try{ await signup(shop,email,pwd); location.reload(); }catch(e){ alert(e.message); } };
+      loginBtn.onclick = async () => { let email = document.getElementById('authEmail').value, pwd = document.getElementById('authPass').value; try { await login(email, pwd); location.reload(); } catch (e) { alert(e.message); } };
+      signupBtn.onclick = async () => { let email = document.getElementById('authEmail').value, pwd = document.getElementById('authPass').value, shop = shopField.value; if (!shop) { shopField.style.display = 'block'; shopField.focus(); return; } try { await signup(shop, email, pwd); location.reload(); } catch (e) { alert(e.message); } };
     }
   })();
 </script>
