@@ -1,763 +1,464 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=yes, viewport-fit=cover">
-    <title>Smart Duka Pro · Complete POS Suite</title>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,300;14..32,400;14..32,500;14..32,600;14..32,700&family=Playfair+Display:ital,wght@0,400;0,500;0,600;1,400&display=swap" rel="stylesheet">
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/qrcodejs@1.0.0/qrcode.min.js"></script>
-    <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-            -webkit-tap-highlight-color: transparent;
-        }
-
-        :root {
-            --bg-deep: #070c0a;
-            --bg-surface: #0e1512;
-            --bg-elevated: #141d19;
-            --border-subtle: rgba(255, 255, 255, 0.05);
-            --border-med: rgba(255, 255, 255, 0.1);
-            --gold-primary: #c9853a;
-            --gold-glow: #e6b062;
-            --gold-soft: rgba(201, 133, 58, 0.15);
-            --emerald: #109b6b;
-            --emerald-light: #2ddb9a;
-            --rose: #e5484d;
-            --blue-accent: #3b82f6;
-            --text-white: #f0f3f1;
-            --text-off: #bccfc2;
-            --text-muted: #6f7e74;
-            --radius-card: 1.5rem;
-            --radius-sm: 0.85rem;
-            --sidebar-w: 270px;
-        }
-
-        body {
-            font-family: 'Inter', system-ui, -apple-system, sans-serif;
-            background: var(--bg-deep);
-            color: var(--text-white);
-            min-height: 100vh;
-            overflow-x: hidden;
-        }
-
-        /* Layout */
-        .app-layout {
-            display: flex;
-            min-height: 100vh;
-        }
-
-        /* Sidebar (desktop) */
-        .sidebar {
-            width: var(--sidebar-w);
-            background: rgba(10, 17, 14, 0.96);
-            backdrop-filter: blur(28px);
-            border-right: 1px solid var(--border-subtle);
-            position: fixed;
-            top: 0;
-            left: 0;
-            bottom: 0;
-            padding: 2rem 0;
-            display: flex;
-            flex-direction: column;
-            z-index: 40;
-            transition: transform 0.25s ease;
-        }
-
-        .logo-area {
-            padding: 0 1.5rem 2rem 1.5rem;
-            border-bottom: 1px solid var(--border-subtle);
-            margin-bottom: 1.75rem;
-            font-family: 'Playfair Display', serif;
-            font-size: 1.8rem;
-            letter-spacing: -0.3px;
-        }
-
-        .logo-area em {
-            color: var(--gold-primary);
-            font-style: italic;
-            font-weight: 600;
-        }
-
-        .nav-list {
-            flex: 1;
-            padding: 0 1rem;
-            display: flex;
-            flex-direction: column;
-            gap: 0.25rem;
-        }
-
-        .nav-item {
-            display: flex;
-            align-items: center;
-            gap: 0.875rem;
-            padding: 0.75rem 1rem;
-            border-radius: 0.9rem;
-            background: transparent;
-            border: none;
-            color: var(--text-muted);
-            font-weight: 500;
-            font-size: 0.9rem;
-            cursor: pointer;
-            transition: all 0.2s;
-            width: 100%;
-            text-align: left;
-        }
-
-        .nav-item i {
-            font-style: normal;
-            font-size: 1.25rem;
-        }
-
-        .nav-item.active {
-            background: var(--gold-soft);
-            color: var(--gold-glow);
-        }
-
-        /* Main content */
-        .main-content {
-            flex: 1;
-            margin-left: var(--sidebar-w);
-            padding: 1.5rem 2rem 6rem;
-        }
-
-        /* Mobile adjustments */
-        @media (max-width: 1024px) {
-            .sidebar {
-                transform: translateX(-100%);
-            }
-            .sidebar.mobile-open {
-                transform: translateX(0);
-            }
-            .main-content {
-                margin-left: 0;
-                padding: 1rem 1rem 5rem;
-            }
-            .mobile-header {
-                display: flex;
-                align-items: center;
-                gap: 1rem;
-                background: rgba(7, 12, 10, 0.9);
-                backdrop-filter: blur(16px);
-                position: sticky;
-                top: 0;
-                padding: 0.8rem 1rem;
-                border-bottom: 1px solid var(--border-subtle);
-                z-index: 30;
-            }
-        }
-
-        @media (min-width: 1025px) {
-            .mobile-header {
-                display: none;
-            }
-        }
-
-        .bottom-nav {
-            position: fixed;
-            bottom: 1rem;
-            left: 1rem;
-            right: 1rem;
-            background: rgba(12, 18, 15, 0.96);
-            backdrop-filter: blur(20px);
-            border: 1px solid var(--border-med);
-            border-radius: 3rem;
-            display: flex;
-            justify-content: space-around;
-            padding: 0.5rem;
-            z-index: 45;
-            display: none;
-        }
-
-        @media (max-width: 1024px) {
-            .bottom-nav {
-                display: flex;
-            }
-        }
-
-        .bottom-nav-btn {
-            flex: 1;
-            background: transparent;
-            border: none;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            gap: 0.2rem;
-            padding: 0.5rem;
-            color: var(--text-muted);
-            font-size: 0.7rem;
-            font-weight: 500;
-            border-radius: 2rem;
-            transition: all 0.2s;
-        }
-
-        .bottom-nav-btn.active {
-            background: var(--gold-soft);
-            color: var(--gold-glow);
-        }
-
-        /* UI Components */
-        .card {
-            background: var(--bg-surface);
-            backdrop-filter: blur(12px);
-            border: 1px solid var(--border-subtle);
-            border-radius: var(--radius-card);
-            padding: 1.5rem;
-            margin-bottom: 1.5rem;
-        }
-
-        .card-header {
-            font-weight: 600;
-            font-size: 1.25rem;
-            margin-bottom: 1.25rem;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
-
-        .btn {
-            border: none;
-            border-radius: 2.5rem;
-            padding: 0.65rem 1.25rem;
-            font-weight: 600;
-            font-size: 0.8rem;
-            cursor: pointer;
-            display: inline-flex;
-            align-items: center;
-            gap: 0.5rem;
-            background: var(--bg-elevated);
-            color: var(--text-off);
-            transition: 0.2s;
-        }
-
-        .btn-primary {
-            background: linear-gradient(105deg, var(--gold-primary), #b26b2c);
-            color: #0a0500;
-            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
-        }
-
-        .btn-success {
-            background: linear-gradient(135deg, var(--emerald), #0a7852);
-            color: white;
-        }
-
-        .btn-outline {
-            border: 1px solid var(--border-med);
-            background: transparent;
-        }
-
-        .input, .select {
-            background: rgba(0, 0, 0, 0.4);
-            border: 1px solid var(--border-med);
-            border-radius: 1rem;
-            padding: 0.75rem 1rem;
-            color: white;
-            font-size: 0.85rem;
-            width: 100%;
-            outline: none;
-            transition: 0.2s;
-        }
-
-        .input:focus, .select:focus {
-            border-color: var(--gold-primary);
-        }
-
-        .grid-2 {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
-            gap: 1rem;
-        }
-
-        .invoice-paper {
-            background: white;
-            color: #1a2a24;
-            border-radius: 1rem;
-            padding: 1.5rem;
-            font-family: 'Inter', monospace;
-            max-width: 400px;
-            margin: 0 auto;
-        }
-
-        .qr-container {
-            display: flex;
-            justify-content: center;
-            margin: 1rem 0;
-        }
-
-        .toast {
-            position: fixed;
-            bottom: 2rem;
-            right: 1.5rem;
-            background: var(--emerald);
-            color: white;
-            padding: 0.8rem 1.5rem;
-            border-radius: 3rem;
-            font-weight: 600;
-            z-index: 200;
-            backdrop-filter: blur(8px);
-            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.3);
-            animation: fadeUp 0.2s ease;
-        }
-
-        @keyframes fadeUp {
-            from {
-                opacity: 0;
-                transform: translateY(12px);
-            }
-        }
-
-        .modal {
-            position: fixed;
-            inset: 0;
-            background: rgba(0, 0, 0, 0.85);
-            backdrop-filter: blur(12px);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            z-index: 100;
-            visibility: hidden;
-            opacity: 0;
-            transition: 0.2s;
-        }
-
-        .modal.open {
-            visibility: visible;
-            opacity: 1;
-        }
-
-        .modal-card {
-            background: var(--bg-elevated);
-            border-radius: 2rem;
-            max-width: 500px;
-            width: 90%;
-            max-height: 85vh;
-            overflow-y: auto;
-            padding: 1.5rem;
-            border: 1px solid var(--border-med);
-        }
-
-        hr {
-            border-color: var(--border-subtle);
-            margin: 0.8rem 0;
-        }
-    </style>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=yes">
+  <title>Smart Duka Pro · Enterprise POS</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,300;400;500;600;700&family=Playfair+Display:ital,wght@0,400;0,500;0,600;1,400&display=swap" rel="stylesheet">
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+    :root {
+      --bg: #050B08; --surface: #0E1612; --card: rgba(18,26,20,0.85); --border: rgba(255,255,255,0.06);
+      --gold: #C8883A; --gold-glow: #E9B96E; --emerald: #0A9167; --rose: #E54562; --blue: #4A9EDF;
+      --text: #EDF2EF; --text-muted: #8BA398; --font-sans: 'Inter', system-ui; --font-serif: 'Playfair Display', serif;
+      --radius: 24px; --radius-sm: 16px;
+    }
+    body { background: var(--bg); color: var(--text); font-family: var(--font-sans); overflow-x: hidden; }
+    #app { display: flex; min-height: 100vh; position: relative; }
+    .sidebar { width: 280px; background: rgba(8,12,10,0.95); backdrop-filter: blur(32px); border-right: 1px solid var(--border); position: fixed; height: 100vh; padding: 32px 0; z-index: 40; transition: transform 0.3s cubic-bezier(0.2,0.9,0.4,1.1); }
+    .logo { padding: 0 28px 32px; border-bottom: 1px solid var(--border); font-family: var(--font-serif); font-size: 28px; letter-spacing: -0.3px; }
+    .logo em { color: var(--gold); font-style: italic; }
+    .nav-item { display: flex; align-items: center; gap: 14px; padding: 14px 24px; margin: 4px 12px; border-radius: 18px; color: var(--text-muted); font-weight: 500; cursor: pointer; background: transparent; border: none; width: calc(100% - 24px); font-size: 14px; }
+    .nav-item i { font-style: normal; font-size: 20px; width: 28px; }
+    .nav-item.active { background: rgba(200,136,58,0.12); color: var(--gold-glow); }
+    .main { flex: 1; margin-left: 280px; }
+    @media (max-width: 1024px) { .sidebar { transform: translateX(-100%); } .sidebar.open { transform: translateX(0); } .main { margin-left: 0; } }
+    .mobile-header { display: none; position: sticky; top: 0; background: rgba(5,11,8,0.9); backdrop-filter: blur(20px); padding: 14px 20px; border-bottom: 1px solid var(--border); z-index: 35; }
+    @media (max-width: 1024px) { .mobile-header { display: flex; align-items: center; gap: 12px; } }
+    .content { padding: 28px 32px 60px; }
+    @media (max-width: 768px) { .content { padding: 20px 16px 80px; } }
+    .card { background: var(--card); backdrop-filter: blur(12px); border: 1px solid var(--border); border-radius: var(--radius); padding: 24px; transition: all 0.2s; }
+    .grid-2 { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 20px; margin-bottom: 28px; }
+    .stat-card { background: linear-gradient(135deg, rgba(18,26,20,0.9), rgba(10,18,13,0.8)); border: 1px solid rgba(200,136,58,0.15); border-radius: 28px; padding: 22px; }
+    .stat-value { font-family: var(--font-serif); font-size: 42px; font-weight: 500; margin-top: 8px; }
+    .btn { border: none; border-radius: 100px; padding: 12px 24px; font-weight: 600; font-size: 14px; cursor: pointer; background: rgba(255,255,255,0.05); color: var(--text); transition: 0.2s; }
+    .btn-primary { background: linear-gradient(135deg, var(--gold), #A86E28); color: #0A0600; }
+    .btn-emerald { background: linear-gradient(135deg, var(--emerald), #076B4E); color: white; }
+    .btn-danger { background: linear-gradient(135deg, var(--rose), #B8293B); color: white; }
+    .modal-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.8); backdrop-filter: blur(12px); z-index: 100; display: none; align-items: center; justify-content: center; }
+    .modal-overlay.on { display: flex; }
+    .modal-sheet { background: #0E1612; border-radius: 32px; max-width: 500px; width: 90%; max-height: 85vh; overflow-y: auto; padding: 28px; border: 1px solid rgba(255,255,255,0.1); }
+    .invoice-preview { background: white; color: #1a2a24; border-radius: 20px; padding: 24px; font-family: 'Courier New', monospace; max-width: 380px; margin: 0 auto; }
+    .toast { position: fixed; bottom: 24px; right: 24px; background: var(--emerald); padding: 12px 24px; border-radius: 40px; font-weight: 600; z-index: 200; animation: fadeIn 0.2s; }
+    @keyframes fadeIn { from { opacity: 0; transform: translateY(20px); } }
+    .bottom-nav { display: none; position: fixed; bottom: 16px; left: 16px; right: 16px; background: rgba(8,12,10,0.95); backdrop-filter: blur(24px); border-radius: 40px; padding: 8px; z-index: 45; justify-content: space-around; }
+    @media (max-width: 1024px) { .bottom-nav { display: flex; } }
+    .bottom-item { flex: 1; text-align: center; padding: 8px; font-size: 10px; color: var(--text-muted); background: transparent; border: none; border-radius: 28px; }
+    .bottom-item.active { background: rgba(200,136,58,0.15); color: var(--gold); }
+    .flex-between { display: flex; justify-content: space-between; align-items: center; }
+    .delete-icon { cursor: pointer; color: var(--rose); font-size: 18px; margin-left: 12px; }
+  </style>
 </head>
 <body>
-<div class="app-layout">
-    <aside class="sidebar" id="sidebar">
-        <div class="logo-area">Smart <em>Duka Pro</em></div>
-        <nav class="nav-list" id="navList"></nav>
-    </aside>
-    <div class="main-content" id="mainContent">
-        <div class="mobile-header">
-            <button class="btn btn-outline" id="menuToggle">☰</button>
-            <span style="font-family: 'Playfair Display', serif; font-size: 1.5rem;">Smart <em style="color: var(--gold-primary);">Duka</em></span>
-        </div>
-        <div id="dynamicPanel"></div>
-    </div>
-    <div class="bottom-nav" id="bottomNav"></div>
+<div id="app" style="display:none">
+  <aside class="sidebar" id="sidebar">
+    <div class="logo">Smart <em>Duka</em></div>
+    <nav id="sideNav"></nav>
+  </aside>
+  <div class="main">
+    <div class="mobile-header"><button class="btn" onclick="toggleSidebar()">☰</button><span style="font-family:var(--font-serif);font-size:24px">Smart <em style="color:var(--gold)">Duka</em></span><button class="btn" onclick="logout()" style="margin-left:auto">🚪</button></div>
+    <div class="content" id="mainContent"></div>
+  </div>
+  <div class="bottom-nav" id="bottomNav"></div>
 </div>
-<div id="toastMessage" class="toast" style="display: none;"></div>
-<div id="globalModal" class="modal"></div>
+<div id="toast" class="toast" style="display:none"></div>
+<div id="modal" class="modal-overlay"></div>
 
 <script>
-    // ----------------------------- DATABASE & STATE -------------------------
-    const DB_NAME = 'smartduka_pro_unified';
-    let db;
-    let products = [];
-    let sales = [];
-    let expenses = [];
-    let customers = [];
-    let invoices = [];
-    let activeModule = 'dashboard';
+  // ---------- AUTH + DB (Enterprise Hardened) ----------
+  const STORAGE_USERS = 'ultra_duka_users';
+  const STORAGE_SESSION = 'ultra_duka_session';
+  let currentUser = null, db = null;
+  let products=[], sales=[], expenses=[], customers=[], invoices=[], customerTxns=[];
+  let activeTab = 'dashboard';
+  let saleCart = [];
+  let revenueChart = null, analyticsChart = null;
 
-    // Helper functions
-    const formatMoney = (val) => `KES ${(val || 0).toLocaleString('en-KE')}`;
-    const showToast = (msg, isError = false) => {
-        const toast = document.getElementById('toastMessage');
-        toast.textContent = msg;
-        toast.style.background = isError ? '#e5484d' : '#109b6b';
-        toast.style.display = 'block';
-        setTimeout(() => toast.style.display = 'none', 2800);
-    };
+  const fmt = n => 'KES ' + (n||0).toLocaleString();
+  const showToast = (msg, err=false) => { let t=document.getElementById('toast'); t.textContent=msg; t.style.background=err?'var(--rose)':'var(--emerald)'; t.style.display='block'; setTimeout(()=>t.style.display='none',3000); };
+  const openModal = (html) => { let m=document.getElementById('modal'); m.innerHTML=`<div class="modal-sheet">${html}<button class="btn" style="margin-top:20px" onclick="closeModal()">Close</button></div>`; m.classList.add('on'); };
+  const closeModal = () => document.getElementById('modal').classList.remove('on');
+  const toggleSidebar = () => document.getElementById('sidebar').classList.toggle('open');
 
-    // IndexedDB
-    function openDatabase() {
-        return new Promise((resolve, reject) => {
-            const request = indexedDB.open(DB_NAME, 3);
-            request.onupgradeneeded = (e) => {
-                const dbRef = e.target.result;
-                const stores = ['products', 'sales', 'expenses', 'customers', 'invoices'];
-                stores.forEach(store => {
-                    if (!dbRef.objectStoreNames.contains(store)) {
-                        dbRef.createObjectStore(store, { keyPath: 'id', autoIncrement: true });
-                    }
-                });
-            };
-            request.onsuccess = (e) => { db = e.target.result; resolve(); };
-            request.onerror = () => reject(request.error);
+  // IndexedDB per user
+  function openUserDB(userId) {
+    return new Promise((res,rej) => {
+      let req = indexedDB.open(`duka_${userId}`, 5);
+      req.onupgradeneeded = e => {
+        let d = e.target.result;
+        ['products','sales','expenses','customers','customerTransactions','invoices'].forEach(s => {
+          if(!d.objectStoreNames.contains(s)) d.createObjectStore(s, {keyPath:'id', autoIncrement:true});
         });
-    }
-
-    async function getAllFromStore(storeName) {
-        return new Promise((resolve) => {
-            const tx = db.transaction(storeName, 'readonly');
-            const store = tx.objectStore(storeName);
-            const req = store.getAll();
-            req.onsuccess = () => resolve(req.result);
-        });
-    }
-
-    async function addToStore(storeName, item) {
-        return new Promise((resolve) => {
-            const tx = db.transaction(storeName, 'readwrite');
-            const req = tx.objectStore(storeName).add(item);
-            req.onsuccess = () => resolve(req.result);
-        });
-    }
-
-    async function updateStore(storeName, item) {
-        return new Promise((resolve) => {
-            const tx = db.transaction(storeName, 'readwrite');
-            tx.objectStore(storeName).put(item);
-            tx.oncomplete = () => resolve();
-        });
-    }
-
-    async function loadAllData() {
-        products = await getAllFromStore('products');
-        sales = await getAllFromStore('sales');
-        expenses = await getAllFromStore('expenses');
-        customers = await getAllFromStore('customers');
-        invoices = await getAllFromStore('invoices');
-    }
-
-    async function seedInitialData() {
-        if (products.length === 0) {
-            await addToStore('products', { name: 'Premium Sugar', unit: 'kg', stock_qty: 120, buying_price: 95, selling_price: 140 });
-            await addToStore('products', { name: 'Fortified Flour', unit: 'kg', stock_qty: 250, buying_price: 68, selling_price: 92 });
-            await addToStore('products', { name: 'Cooking Oil', unit: 'L', stock_qty: 80, buying_price: 210, selling_price: 270 });
-        }
-        if (expenses.length === 0) {
-            await addToStore('expenses', { description: 'Shop rent', amount: 15000, date: new Date().toISOString() });
-        }
-        await loadAllData();
-    }
-
-    // ----------------------------- UI NAVIGATION -------------------------
-    const modules = [
-        { id: 'dashboard', icon: '📊', label: 'Dashboard' },
-        { id: 'pos', icon: '🛒', label: 'Point of Sale' },
-        { id: 'invoices', icon: '🧾', label: 'Invoices' },
-        { id: 'inventory', icon: '📦', label: 'Stock' },
-        { id: 'customers', icon: '👥', label: 'Clients' },
-        { id: 'expenses', icon: '💰', label: 'Expenses' },
-        { id: 'analytics', icon: '📈', label: 'Reports' }
-    ];
-
-    function buildNavigation() {
-        const navList = document.getElementById('navList');
-        const bottomNav = document.getElementById('bottomNav');
-        const navItems = modules.map(m => `
-            <button class="nav-item" data-module="${m.id}">
-                <i>${m.icon}</i> ${m.label}
-            </button>
-        `).join('');
-        const bottomItems = modules.map(m => `
-            <button class="bottom-nav-btn" data-module="${m.id}">
-                <span>${m.icon}</span> <span>${m.label}</span>
-            </button>
-        `).join('');
-        navList.innerHTML = navItems;
-        bottomNav.innerHTML = bottomItems;
-
-        document.querySelectorAll('.nav-item, .bottom-nav-btn').forEach(btn => {
-            btn.addEventListener('click', (e) => {
-                const moduleId = btn.getAttribute('data-module');
-                if (moduleId) switchModule(moduleId);
-            });
-        });
-    }
-
-    function switchModule(moduleId) {
-        activeModule = moduleId;
-        document.querySelectorAll('.nav-item, .bottom-nav-btn').forEach(el => el.classList.remove('active'));
-        document.querySelectorAll(`[data-module="${moduleId}"]`).forEach(el => el.classList.add('active'));
-        renderActiveModule();
-        if (window.innerWidth <= 1024) {
-            document.getElementById('sidebar').classList.remove('mobile-open');
-        }
-    }
-
-    function renderActiveModule() {
-        const container = document.getElementById('dynamicPanel');
-        switch (activeModule) {
-            case 'dashboard': container.innerHTML = renderDashboard(); break;
-            case 'pos': container.innerHTML = renderPOS(); attachPOSEvents(); break;
-            case 'invoices': container.innerHTML = renderInvoiceHistory(); renderInvoiceListUI(); break;
-            case 'inventory': container.innerHTML = renderInventory(); renderProductTable(); break;
-            case 'customers': container.innerHTML = renderCustomers(); renderCustomerTable(); break;
-            case 'expenses': container.innerHTML = renderExpenses(); attachExpenseEvents(); break;
-            case 'analytics': container.innerHTML = renderAnalytics(); break;
-            default: container.innerHTML = renderDashboard();
-        }
-    }
-
-    // ----------------------------- DASHBOARD -----------------------------
-    function renderDashboard() {
-        const totalRevenue = sales.reduce((sum, s) => sum + (s.totalAmount || s.amount || 0), 0);
-        const totalExp = expenses.reduce((sum, e) => sum + e.amount, 0);
-        const lowStock = products.filter(p => p.stock_qty <= (p.low_threshold || 5)).length;
-        return `
-            <div class="card">
-                <div class="card-header">🏪 Business Pulse</div>
-                <div class="grid-2">
-                    <div class="card" style="background: var(--bg-elevated);"><strong>📈 Revenue</strong><br><span style="font-size: 2rem;">${formatMoney(totalRevenue)}</span></div>
-                    <div class="card" style="background: var(--bg-elevated);"><strong>📉 Expenses</strong><br><span style="font-size: 2rem;">${formatMoney(totalExp)}</span></div>
-                    <div class="card" style="background: var(--bg-elevated);"><strong>📦 Low Stock Alerts</strong><br><span style="font-size: 2rem;">${lowStock}</span></div>
-                    <div class="card" style="background: var(--bg-elevated);"><strong>👥 Customers</strong><br><span style="font-size: 2rem;">${customers.length}</span></div>
-                </div>
-            </div>
-        `;
-    }
-
-    // ----------------------------- POINT OF SALE (multi-item cart) -----------------------------
-    let currentCart = [];
-    function renderPOS() {
-        const productOptions = products.map(p => `<option value="${p.id}">${p.name} (${p.stock_qty} ${p.unit}) - ${formatMoney(p.selling_price)}</option>`).join('');
-        return `
-            <div class="card">
-                <div class="card-header">🧾 New Transaction</div>
-                <input type="text" id="posCustomer" class="input" placeholder="Customer name" style="margin-bottom: 1rem;">
-                <div class="grid-2" style="margin-bottom: 1rem;">
-                    <select id="posProductSelect" class="select">${productOptions}</select>
-                    <input type="number" id="posQty" class="input" placeholder="Qty" value="1">
-                </div>
-                <div style="display: flex; gap: 0.5rem; margin-bottom: 1rem;">
-                    <button id="addToCartBtn" class="btn btn-primary">➕ Add item</button>
-                    <select id="posPaymentMethod" class="select" style="width: auto;"><option value="cash">Cash</option><option value="mpesa">M-Pesa</option><option value="credit">Credit</option></select>
-                </div>
-                <div id="cartPreview" style="background: var(--bg-deep); border-radius: 1rem; padding: 0.75rem; margin-bottom: 1rem;"></div>
-                <div style="font-weight: bold; margin-bottom: 1rem;">Total: <span id="cartTotal">KES 0</span></div>
-                <button id="completeSaleBtn" class="btn btn-success">✅ Complete Sale & Invoice</button>
-            </div>
-            <div id="liveInvoicePreview" class="card" style="display: none;"></div>
-        `;
-    }
-
-    function updateCartUI() {
-        const container = document.getElementById('cartPreview');
-        const totalSpan = document.getElementById('cartTotal');
-        let total = 0;
-        if (!container) return;
-        container.innerHTML = currentCart.map((item, idx) => {
-            const lineTotal = item.price * item.qty;
-            total += lineTotal;
-            return `<div style="display: flex; justify-content: space-between; border-bottom: 1px solid var(--border-subtle); padding: 0.3rem 0;">${item.name} x${item.qty} → ${formatMoney(lineTotal)} <button class="btn" style="padding: 0.2rem 0.6rem;" data-cartidx="${idx}">✖</button></div>`;
-        }).join('');
-        if (totalSpan) totalSpan.innerText = formatMoney(total);
-        document.querySelectorAll('[data-cartidx]').forEach(btn => {
-            btn.addEventListener('click', (e) => {
-                const idx = parseInt(btn.getAttribute('data-cartidx'));
-                currentCart.splice(idx, 1);
-                updateCartUI();
-            });
-        });
-    }
-
-    function attachPOSEvents() {
-        document.getElementById('addToCartBtn')?.addEventListener('click', () => {
-            const prodId = parseInt(document.getElementById('posProductSelect').value);
-            const qty = parseFloat(document.getElementById('posQty').value) || 1;
-            const product = products.find(p => p.id === prodId);
-            if (!product) return showToast('Product not found', true);
-            if (product.stock_qty < qty) return showToast(`Only ${product.stock_qty} left`, true);
-            const cartItem = { id: product.id, name: product.name, qty, price: product.selling_price, unit: product.unit };
-            currentCart.push(cartItem);
-            updateCartUI();
-            document.getElementById('posQty').value = 1;
-        });
-        document.getElementById('completeSaleBtn')?.addEventListener('click', async () => {
-            const customerName = document.getElementById('posCustomer').value.trim();
-            if (!customerName) return showToast('Customer name required', true);
-            if (currentCart.length === 0) return showToast('Cart empty', true);
-            const method = document.getElementById('posPaymentMethod').value;
-            let totalSale = 0;
-            for (const item of currentCart) totalSale += item.price * item.qty;
-            // Deduct stock
-            for (const cartItem of currentCart) {
-                const prod = products.find(p => p.id === cartItem.id);
-                if (prod) {
-                    prod.stock_qty -= cartItem.qty;
-                    await updateStore('products', prod);
-                }
-            }
-            const saleRecord = { customerName, items: [...currentCart], totalAmount: totalSale, method, date: new Date().toISOString() };
-            const saleId = await addToStore('sales', saleRecord);
-            // Handle customer credit
-            let cust = customers.find(c => c.name.toLowerCase() === customerName.toLowerCase());
-            if (!cust) {
-                const newCust = { name: customerName, phone: '', balance: 0, creditTotal: 0, paidTotal: 0 };
-                const newId = await addToStore('customers', newCust);
-                cust = { ...newCust, id: newId };
-                customers.push(cust);
-            }
-            if (method === 'credit') {
-                cust.creditTotal = (cust.creditTotal || 0) + totalSale;
-                cust.balance = cust.creditTotal - (cust.paidTotal || 0);
-                await updateStore('customers', cust);
-            }
-            // generate invoice
-            const invNumber = `INV-${new Date().getFullYear()}-${String(invoices.length + 1).padStart(5, '0')}`;
-            const newInvoice = { number: invNumber, saleId, customerName, items: currentCart.map(i => ({ name: i.name, qty: i.qty, price: i.price, unit: i.unit })), total: totalSale, method, date: new Date().toISOString(), shopName: 'Smart Duka Pro' };
-            const invoiceId = await addToStore('invoices', newInvoice);
-            invoices.push(newInvoice);
-            showToast(`Invoice ${invNumber} created`);
-            currentCart = [];
-            updateCartUI();
-            document.getElementById('posCustomer').value = '';
-            await loadAllData();
-            renderActiveModule(); // refresh stock view after sale
-            const previewDiv = document.getElementById('liveInvoicePreview');
-            if (previewDiv) {
-                previewDiv.style.display = 'block';
-                previewDiv.innerHTML = renderInvoiceHTML(newInvoice) + `<div class="flex-row" style="display:flex; gap:0.5rem; margin-top:1rem;"><button class="btn btn-primary" onclick="window.printInvoiceById(${invoiceId})">🖨️ Print</button><button class="btn btn-success" onclick="window.shareInvoiceViaWhatsApp(${invoiceId})">📲 WhatsApp</button><button class="btn btn-outline" onclick="window.downloadInvoicePDF(${invoiceId})">📄 PDF</button></div>`;
-            }
-        });
-    }
-
-    // Invoice rendering helpers
-    function renderInvoiceHTML(inv) {
-        const itemsHtml = inv.items.map(i => `<tr><td>${i.name}</td><td>${i.qty} ${i.unit || ''}</td><td>${formatMoney(i.price)}</td></tr>`).join('');
-        const qrId = `qr_inv_${inv.id || Date.now()}`;
-        setTimeout(() => {
-            const qrElem = document.getElementById(qrId);
-            if (qrElem && typeof QRCode !== 'undefined') new QRCode(qrElem, { text: `INV:${inv.number}`, width: 70, height: 70 });
-        }, 80);
-        return `<div class="invoice-paper" id="printableInvoice">
-            <h3 style="text-align:center;">${inv.shopName || 'Smart Duka Pro'}</h3>
-            <p style="text-align:center;">${inv.number} | ${new Date(inv.date).toLocaleString()}</p>
-            <hr><p><strong>Customer:</strong> ${inv.customerName}</p>
-            <table style="width:100%; margin: 10px 0;"><thead><tr><th>Item</th><th>Qty</th><th>Price</th></tr></thead><tbody>${itemsHtml}</tbody></table>
-            <hr><p><strong>Total:</strong> ${formatMoney(inv.total)} | <strong>Paid via:</strong> ${inv.method}</p>
-            <p style="text-align:center;">Asante sana, karibu tena!</p>
-            <div id="${qrId}" class="qr-container"></div>
-        </div>`;
-    }
-
-    window.printInvoiceById = async (id) => {
-        const inv = invoices.find(i => i.id === id);
-        if (!inv) return;
-        const win = window.open('', '_blank', 'width=450,height=600');
-        win.document.write(`<html><head><title>Invoice ${inv.number}</title><style>body{font-family:monospace;}</style></head><body>${renderInvoiceHTML(inv)}</body></html>`);
-        win.document.close();
-        win.print();
-    };
-    window.shareInvoiceViaWhatsApp = (id) => {
-        const inv = invoices.find(i => i.id === id);
-        if (!inv) return;
-        const cust = customers.find(c => c.name === inv.customerName);
-        let phone = cust?.phone;
-        if (!phone) phone = prompt('Customer phone (2547xxxxxx):');
-        if (!phone) return;
-        const msg = `🧾 *Invoice ${inv.number}*\n👤 ${inv.customerName}\n💰 ${formatMoney(inv.total)}\n🏪 Smart Duka Pro\n🙏 Thank you!`;
-        window.open(`https://wa.me/${phone.replace(/\D/g, '')}?text=${encodeURIComponent(msg)}`, '_blank');
-    };
-    window.downloadInvoicePDF = async (id) => {
-        const inv = invoices.find(i => i.id === id);
-        if (!inv) return;
-        const tempDiv = document.createElement('div');
-        tempDiv.innerHTML = renderInvoiceHTML(inv);
-        document.body.appendChild(tempDiv);
-        await html2pdf().set({ margin: 0.5, filename: `invoice_${inv.number}.pdf` }).from(tempDiv).save();
-        document.body.removeChild(tempDiv);
-    };
-
-    // Invoice history
-    function renderInvoiceHistory() { return `<div class="card"><div class="card-header">📜 All Invoices</div><div id="invoiceListContainer"></div></div>`; }
-    function renderInvoiceListUI() {
-        const container = document.getElementById('invoiceListContainer');
-        if (!container) return;
-        container.innerHTML = invoices.slice().reverse().map(inv => `
-            <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid var(--border-subtle); padding: 0.75rem 0;">
-                <div><strong>${inv.number}</strong><br>${inv.customerName} | ${formatMoney(inv.total)}</div>
-                <div><button class="btn" onclick="window.printInvoiceById(${inv.id})">🖨️</button> <button class="btn" onclick="window.shareInvoiceViaWhatsApp(${inv.id})">📲</button></div>
-            </div>
-        `).join('');
-    }
-
-    // Inventory
-    function renderInventory() { return `<div class="card"><div class="card-header">📦 Stock Management <button class="btn btn-primary" id="addProductBtn">+ New Product</button></div><div id="productTable"></div></div>`; }
-    async function renderProductTable() {
-        const container = document.getElementById('productTable');
-        if (!container) return;
-        container.innerHTML = products.map(p => `<div style="display: flex; justify-content: space-between; padding: 0.6rem; background: var(--bg-deep); margin: 0.4rem 0; border-radius: 0.8rem;"><span><b>${p.name}</b> (${p.stock_qty} ${p.unit}) - Sell ${formatMoney(p.selling_price)}</span><button class="btn btn-outline" onclick="window.adjustStock(${p.id})">✏️ Adjust</button></div>`).join('');
-    }
-    window.adjustStock = async (id) => {
-        const prod = products.find(p => p.id === id);
-        const newQty = prompt(`Current stock: ${prod.stock_qty}. Enter new quantity:`, prod.stock_qty);
-        if (newQty !== null && !isNaN(parseFloat(newQty))) { prod.stock_qty = parseFloat(newQty); await updateStore('products', prod); await loadAllData(); renderProductTable(); showToast('Stock updated'); }
-    };
-    document.addEventListener('click', async (e) => {
-        if (e.target.id === 'addProductBtn') {
-            const name = prompt('Product name:'); const unit = prompt('Unit:'); const price = parseFloat(prompt('Selling price:')); const stock = parseFloat(prompt('Initial stock:')); const buy = parseFloat(prompt('Buy price:'));
-            if (name) await addToStore('products', { name, unit, stock_qty: stock, selling_price: price, buying_price: buy, low_threshold: 5 });
-            await loadAllData(); renderProductTable();
-        }
+      };
+      req.onsuccess = e => { db = e.target.result; res(); };
+      req.onerror = rej;
     });
+  }
+  const getAll = store => new Promise(r => { let tx=db.transaction(store,'readonly').objectStore(store).getAll(); tx.onsuccess=()=>r(tx.result); });
+  const addItem = (store,item) => new Promise(r => { let tx=db.transaction(store,'readwrite'), req=tx.objectStore(store).add(item); req.onsuccess=()=>r(req.result); });
+  const updateItem = (store,item) => new Promise(r => { let tx=db.transaction(store,'readwrite'), req=tx.objectStore(store).put(item); req.onsuccess=()=>r(); });
+  const deleteItem = (store,id) => new Promise(r => { let tx=db.transaction(store,'readwrite'), req=tx.objectStore(store).delete(id); req.onsuccess=()=>r(); });
 
-    // Customers
-    function renderCustomers() { return `<div class="card"><div class="card-header">👥 Customer Directory</div><div id="customerList"></div></div>`; }
-    function renderCustomerTable() {
-        const cont = document.getElementById('customerList');
-        if (!cont) return;
-        cont.innerHTML = customers.map(c => `<div style="padding:0.6rem; background: var(--bg-deep); border-radius: 0.8rem; margin: 0.4rem 0;">${c.name} | Balance: ${formatMoney(c.balance || 0)} <button class="btn btn-outline" onclick="window.recordPayment(${c.id})">Record Payment</button></div>`).join('');
+  async function loadData() {
+    products = await getAll('products');
+    sales = await getAll('sales');
+    expenses = await getAll('expenses');
+    customers = await getAll('customers');
+    invoices = await getAll('invoices');
+    customerTxns = await getAll('customerTransactions');
+  }
+
+  // Auth
+  function hashPassword(pw) { let h=0; for(let i=0;i<pw.length;i++){h=((h<<5)-h)+pw.charCodeAt(i);h|=0;} return Math.abs(h).toString(16); }
+  function getUsers() { return JSON.parse(localStorage.getItem(STORAGE_USERS)||'[]'); }
+  function saveUsers(users) { localStorage.setItem(STORAGE_USERS, JSON.stringify(users)); }
+  function findUser(email) { return getUsers().find(u=>u.email.toLowerCase()===email.toLowerCase()); }
+  function createSession(user) { let sess={userId:user.id, email:user.email, shopName:user.shopName, expires:Date.now()+7*86400000}; localStorage.setItem(STORAGE_SESSION, JSON.stringify(sess)); currentUser=user; }
+  function getSession() { let s=localStorage.getItem(STORAGE_SESSION); if(!s) return null; let sess=JSON.parse(s); if(Date.now()>sess.expires) { localStorage.removeItem(STORAGE_SESSION); return null; } return sess; }
+  async function logout() { localStorage.removeItem(STORAGE_SESSION); db=null; location.reload(); }
+  async function login(email, password) {
+    let user = findUser(email);
+    if(!user || user.passwordHash !== hashPassword(password)) throw new Error('Invalid credentials');
+    createSession(user);
+    await openUserDB(user.id);
+    await loadData();
+    await seedData();
+    document.getElementById('app').style.display = 'flex';
+    await renderApp();
+  }
+  async function signup(shopName, email, password) {
+    if(findUser(email)) throw new Error('Email exists');
+    let userId = 'u'+Date.now()+'_'+Math.random().toString(36).substr(2,6);
+    let newUser = { id:userId, email:email.toLowerCase(), passwordHash:hashPassword(password), shopName };
+    let users = getUsers();
+    users.push(newUser);
+    saveUsers(users);
+    createSession(newUser);
+    await openUserDB(userId);
+    await loadData();
+    await seedData();
+    document.getElementById('app').style.display = 'flex';
+    await renderApp();
+  }
+  async function seedData() {
+    if(products.length===0) {
+      await addItem('products', {name:'Sugar', unit:'kg', stock_qty:120, buying_price:100, selling_price:140, low_threshold:10});
+      await addItem('products', {name:'Flour', unit:'kg', stock_qty:200, buying_price:70, selling_price:95, low_threshold:15});
+      await addItem('products', {name:'Cooking Oil', unit:'L', stock_qty:80, buying_price:210, selling_price:270, low_threshold:8});
     }
-    window.recordPayment = async (custId) => {
-        const cust = customers.find(c => c.id === custId);
-        const amt = parseFloat(prompt(`Current balance ${formatMoney(cust.balance)}. Payment amount:`));
-        if (amt > 0) { cust.paidTotal = (cust.paidTotal || 0) + amt; cust.balance = (cust.creditTotal || 0) - cust.paidTotal; await updateStore('customers', cust); await loadAllData(); renderCustomerTable(); showToast(`Payment recorded, new balance ${formatMoney(cust.balance)}`); }
-    };
-
-    // Expenses
-    function renderExpenses() { return `<div class="card"><div class="card-header">📉 Expense Tracker <button id="addExpenseBtn" class="btn btn-primary">+ Add Expense</button></div><div id="expenseList"></div></div>`; }
-    async function attachExpenseEvents() {
-        document.getElementById('addExpenseBtn')?.addEventListener('click', async () => {
-            const desc = prompt('Description'); const amt = parseFloat(prompt('Amount (KES)'));
-            if (desc && amt) await addToStore('expenses', { description: desc, amount: amt, date: new Date().toISOString() });
-            await loadAllData(); renderExpenseList();
-        });
-        renderExpenseList();
+    if(customers.length===0) {
+      await addItem('customers', {name:'Jane Wanjiku', phone:'0712345678', totalSpent:0, credit:0, debit:0, balance:0});
+      await addItem('customers', {name:'Peter Omondi', phone:'0723456789', totalSpent:0, credit:0, debit:0, balance:0});
     }
-    async function renderExpenseList() {
-        const container = document.getElementById('expenseList');
-        if (!container) return;
-        container.innerHTML = expenses.map(e => `<div style="padding:0.5rem; border-bottom:1px solid var(--border-subtle);">${e.description}: ${formatMoney(e.amount)} (${new Date(e.date).toLocaleDateString()})</div>`).join('');
+    await loadData();
+  }
+
+  // ---------- UI Rendering ----------
+  function buildNav() {
+    let tabs = [
+      {id:'dashboard', icon:'📊', label:'Dashboard'},
+      {id:'sales', icon:'🛒', label:'POS'},
+      {id:'products', icon:'📦', label:'Stock'},
+      {id:'customers', icon:'👥', label:'Clients'},
+      {id:'invoices', icon:'🧾', label:'Invoices'},
+      {id:'expenses', icon:'💸', label:'Expenses'},
+      {id:'analytics', icon:'📈', label:'Analytics'}
+    ];
+    document.getElementById('sideNav').innerHTML = tabs.map(t => `<button class="nav-item" onclick="switchTab('${t.id}')"><i>${t.icon}</i> ${t.label}</button>`).join('');
+    document.getElementById('bottomNav').innerHTML = tabs.map(t => `<button class="bottom-item" onclick="switchTab('${t.id}')"><div>${t.icon}</div><div>${t.label}</div></button>`).join('');
+  }
+
+  function switchTab(id) {
+    activeTab = id;
+    document.querySelectorAll('.nav-item, .bottom-item').forEach(el => el.classList.remove('active'));
+    document.querySelector(`.nav-item[onclick="switchTab('${id}')"]`)?.classList.add('active');
+    document.querySelector(`.bottom-item[onclick="switchTab('${id}')"]`)?.classList.add('active');
+    renderContent();
+    if(window.innerWidth<=1024) document.getElementById('sidebar').classList.remove('open');
+  }
+
+  function renderContent() {
+    let container = document.getElementById('mainContent');
+    if(activeTab === 'dashboard') container.innerHTML = renderDashboard();
+    else if(activeTab === 'sales') container.innerHTML = renderPOS();
+    else if(activeTab === 'products') container.innerHTML = renderProducts();
+    else if(activeTab === 'customers') container.innerHTML = renderCustomers();
+    else if(activeTab === 'invoices') container.innerHTML = renderInvoices();
+    else if(activeTab === 'expenses') container.innerHTML = renderExpenses();
+    else if(activeTab === 'analytics') container.innerHTML = renderAnalytics();
+    
+    if(activeTab === 'sales') attachPOSEvents();
+    if(activeTab === 'products') renderProductList();
+    if(activeTab === 'customers') { renderCustomerList(); attachCustomerSearch(); }
+    if(activeTab === 'invoices') renderInvoiceList();
+    if(activeTab === 'expenses') renderExpenseList();
+    if(activeTab === 'dashboard') setTimeout(drawCharts, 100);
+    if(activeTab === 'analytics') drawAnalyticsChart();
+  }
+
+  // ---------- DASHBOARD with Delete Shortcuts ----------
+  function renderDashboard() {
+    let totalRevenue = sales.reduce((a,b)=>a+b.amount,0);
+    let totalExpenses = expenses.reduce((a,b)=>a+b.amount,0);
+    let profit = totalRevenue - totalExpenses;
+    let todaySales = sales.filter(s => new Date(s.date).toDateString() === new Date().toDateString()).reduce((a,b)=>a+b.amount,0);
+    let lowStock = products.filter(p => p.stock_qty <= p.low_threshold).length;
+    let recentSales = sales.slice().reverse().slice(0,5);
+    let topProducts = [...sales.reduce((map, s) => { map.set(s.product, (map.get(s.product)||0)+s.amount); return map; }, new Map())].sort((a,b)=>b[1]-a[1]).slice(0,3);
+    return `
+      <div class="grid-2">
+        <div class="stat-card"><div>💰 Total Revenue</div><div class="stat-value">${fmt(totalRevenue)}</div></div>
+        <div class="stat-card"><div>📉 Expenses</div><div class="stat-value" style="color:#E54562">${fmt(totalExpenses)}</div></div>
+        <div class="stat-card"><div>📈 Net Profit</div><div class="stat-value" style="color:${profit>=0?'var(--emerald)':'#E54562'}">${fmt(profit)}</div></div>
+        <div class="stat-card"><div>🕒 Today's Sales</div><div class="stat-value">${fmt(todaySales)}</div></div>
+      </div>
+      <div class="grid-2">
+        <div class="card"><div class="flex-between"><h3>📅 Revenue Trend (Last 7 days)</h3></div><canvas id="revenueCanvas" height="180"></canvas></div>
+        <div class="card"><div class="flex-between"><h3>🏷️ Top Products</h3></div><div id="topProductsList">${topProducts.map(([name,amt])=>`<div style="display:flex;justify-content:space-between;padding:10px 0;border-bottom:1px solid var(--border)"><span>${name}</span><span>${fmt(amt)}</span></div>`).join('')}</div><div class="stat-card" style="margin-top:16px"><div>⚠️ Low Stock Alert</div><div class="stat-value" style="font-size:28px">${lowStock} items</div></div></div>
+      </div>
+      <div class="card"><h3>📋 Recent Transactions <span style="font-size:12px;color:var(--text-muted)">(click 🗑 to delete)</span></h3>${recentSales.map(s=>`<div class="flex-between" style="padding:12px 0;border-bottom:1px solid var(--border)"><span>${s.customerName||'Walk-in'} · ${s.product}</span><div><span style="margin-right:12px">${fmt(s.amount)}</span><span class="delete-icon" onclick="deleteSaleById(${s.id})">🗑</span></div></div>`).join('') || '<div>No sales yet</div>'}</div>
+    `;
+  }
+
+  function drawCharts() {
+    let canvas = document.getElementById('revenueCanvas');
+    if(!canvas) return;
+    if(revenueChart) revenueChart.destroy();
+    let last7 = [];
+    for(let i=6;i>=0;i--) { let d = new Date(); d.setDate(d.getDate()-i); last7.push(d.toLocaleDateString('en-US',{weekday:'short'})); }
+    let sales7 = last7.map((_,idx) => {
+      let d = new Date(); d.setDate(d.getDate()-(6-idx));
+      return sales.filter(s => new Date(s.date).toDateString() === d.toDateString()).reduce((a,b)=>a+b.amount,0);
+    });
+    let ctx = canvas.getContext('2d');
+    revenueChart = new Chart(ctx, { type:'line', data:{ labels:last7, datasets:[{ label:'Sales (KES)', data:sales7, borderColor:'#C8883A', backgroundColor:'rgba(200,136,58,0.1)', fill:true, tension:0.3 }] }, options:{ responsive:true, maintainAspectRatio:true } });
+  }
+
+  // ---------- POS with Cart ----------
+  function renderPOS() {
+    if(!products.length) return '<div class="card">Loading products...</div>';
+    return `<div class="card"><h3>🛒 Point of Sale</h3>
+      <div class="flex-between" style="margin:16px 0;flex-wrap:wrap;gap:8px"><input id="posCustomer" placeholder="Customer name" class="btn" style="flex:1;background:var(--surface);border:1px solid var(--border);border-radius:40px;padding:12px"><select id="posProductSelect" style="background:var(--surface);border:1px solid var(--border);border-radius:40px;padding:12px;min-width:140px">${products.map(p=>`<option value="${p.id}">${p.name} (${p.stock_qty} ${p.unit}) - ${fmt(p.selling_price)}</option>`)}</select><input id="posQty" type="number" value="1" style="width:80px;background:var(--surface);border-radius:40px;padding:12px;border:1px solid var(--border)"><button class="btn btn-primary" id="addToCartBtn">+ Add</button></div>
+      <div id="cartItems" class="card" style="margin:16px 0;background:rgba(0,0,0,0.3)"></div>
+      <div class="flex-between"><h4>Total: <span id="cartTotal">KES 0</span></h4><select id="payMethodSelect" style="background:var(--surface);border-radius:40px;padding:10px"><option value="cash">Cash</option><option value="mpesa">M-Pesa</option><option value="credit">Credit</option></select><button class="btn btn-emerald" id="completeSaleBtn">✅ Complete Sale & Invoice</button></div>
+      <div id="invoicePreview" class="invoice-preview" style="margin-top:24px;display:none"></div></div>`;
+  }
+
+  function attachPOSEvents() {
+    document.getElementById('addToCartBtn')?.addEventListener('click', () => {
+      let pid = parseInt(document.getElementById('posProductSelect').value);
+      let qty = parseFloat(document.getElementById('posQty').value) || 1;
+      let prod = products.find(p=>p.id===pid);
+      if(!prod) return showToast('Product error', true);
+      if(prod.stock_qty < qty) return showToast(`Only ${prod.stock_qty} left`, true);
+      let existing = saleCart.find(i=>i.id===pid);
+      if(existing) existing.qty += qty;
+      else saleCart.push({id:pid, name:prod.name, qty, price:prod.selling_price, unit:prod.unit});
+      updateCartUI();
+    });
+    document.getElementById('completeSaleBtn')?.addEventListener('click', async () => {
+      let customerName = document.getElementById('posCustomer').value.trim();
+      if(!customerName) return showToast('Customer name required', true);
+      if(saleCart.length===0) return showToast('Cart empty', true);
+      let method = document.getElementById('payMethodSelect').value;
+      let total = saleCart.reduce((s,i)=>s + i.qty*i.price, 0);
+      for(let item of saleCart) {
+        let prod = products.find(p=>p.id===item.id);
+        if(prod) { prod.stock_qty -= item.qty; await updateItem('products', prod); }
+      }
+      let cust = customers.find(c=>c.name.toLowerCase()===customerName.toLowerCase());
+      if(!cust) { let cid = await addItem('customers', {name:customerName, phone:'', totalSpent:0, credit:0, debit:0, balance:0}); cust = {id:cid, name:customerName, totalSpent:0, credit:0, debit:0, balance:0}; customers.push(cust); }
+      if(method === 'credit') { cust.credit += total; cust.balance = cust.credit - cust.debit; await updateItem('customers', cust); }
+      cust.totalSpent = (cust.totalSpent||0) + total;
+      await updateItem('customers', cust);
+      let saleObj = { customerName, items: saleCart.map(i=>({name:i.name, qty:i.qty, price:i.price})), amount:total, product: saleCart.map(i=>i.name).join(', '), method, date:new Date().toISOString() };
+      let saleId = await addItem('sales', saleObj);
+      let invNumber = `INV-${new Date().getFullYear()}-${String(invoices.length+1).padStart(5,'0')}`;
+      let inv = { number: invNumber, saleId, customerName, items: saleCart.map(i=>({name:i.name, qty:i.qty, price:i.price, unit:i.unit})), total, method, date:new Date().toISOString(), shopName: currentUser?.shopName || 'Smart Duka' };
+      let invId = await addItem('invoices', inv);
+      invoices.push(inv);
+      if(method === 'credit') await addItem('customerTransactions', { customerId:cust.id, type:'credit', amount:total, note:`Sale: ${saleCart.map(i=>i.name).join(', ')}`, date:new Date().toISOString() });
+      else await addItem('customerTransactions', { customerId:cust.id, type:'debit', amount:total, note:`Sale: ${saleCart.map(i=>i.name).join(', ')}`, date:new Date().toISOString() });
+      showToast(`Invoice ${invNumber} created`);
+      let previewDiv = document.getElementById('invoicePreview');
+      previewDiv.style.display = 'block';
+      previewDiv.innerHTML = renderInvoiceHTML(inv) + `<div class="flex-between" style="margin-top:16px"><button class="btn btn-primary" onclick="printInvoice(${inv.id})">🖨️ Print</button><button class="btn" onclick="downloadInvoicePDF(${inv.id})">📄 PDF</button></div>`;
+      saleCart = [];
+      updateCartUI();
+      document.getElementById('posCustomer').value = '';
+      await loadData();
+      if(activeTab === 'dashboard') renderContent(); // refresh dashboard after sale
+    });
+  }
+
+  function updateCartUI() {
+    let cartDiv = document.getElementById('cartItems');
+    if(!cartDiv) return;
+    let total = saleCart.reduce((s,i)=>s + i.qty*i.price,0);
+    cartDiv.innerHTML = saleCart.map((item,idx) => `<div class="flex-between" style="margin:8px 0"><span>${item.name} x${item.qty} ${item.unit}</span><span>${fmt(item.qty*item.price)}</span><button class="btn" onclick="window.removeCartItem(${idx})">✖</button></div>`).join('');
+    document.getElementById('cartTotal').innerText = fmt(total);
+  }
+  window.removeCartItem = (idx) => { saleCart.splice(idx,1); updateCartUI(); };
+
+  function renderInvoiceHTML(inv) {
+    let itemsHtml = inv.items.map(i => `<tr><td>${i.name}</td><td>${i.qty} ${i.unit||''}</td><td>${fmt(i.price)}</td>`).join('');
+    return `<div style="font-family:monospace;background:white;color:#111;padding:20px;border-radius:16px;max-width:380px;margin:auto"><h3 style="text-align:center">${inv.shopName}</h3><p style="text-align:center">${inv.number} | ${new Date(inv.date).toLocaleString()}</p><hr><p><b>Customer:</b> ${inv.customerName}</p><table style="width:100%;margin:12px 0"><thead><tr><th>Item</th><th>Qty</th><th>Price</th></tr></thead><tbody>${itemsHtml}</tbody></table><hr><p><b>Total:</b> ${fmt(inv.total)} | <b>Method:</b> ${inv.method}</p><p style="text-align:center">Asante Sana!</p></div>`;
+  }
+  window.printInvoice = async (id) => {
+    let inv = invoices.find(i=>i.id===id);
+    if(!inv) return;
+    let win = window.open('','_blank','width=450,height=600');
+    win.document.write(`<html><head><title>Invoice ${inv.number}</title><style>body{font-family:monospace}</style></head><body>${renderInvoiceHTML(inv)}</body></html>`);
+    win.document.close();
+    win.print();
+  };
+  window.downloadInvoicePDF = async (id) => {
+    let inv = invoices.find(i=>i.id===id);
+    if(!inv) return;
+    let div = document.createElement('div'); div.innerHTML = renderInvoiceHTML(inv);
+    document.body.appendChild(div);
+    await html2pdf().set({margin:0.5, filename:`invoice-${inv.number}.pdf`}).from(div).save();
+    document.body.removeChild(div);
+  };
+
+  // ---------- DELETE LOGIC (Complete with integrity) ----------
+  window.deleteSaleById = async (saleId) => {
+    if(!confirm('⚠️ Delete this sale? Stock and customer balance will be restored.')) return;
+    let sale = sales.find(s=>s.id===saleId);
+    if(!sale) return showToast('Sale not found', true);
+    // revert stock
+    if(sale.items && sale.items.length) {
+      for(let item of sale.items) {
+        let prod = products.find(p=>p.name === item.name);
+        if(prod) { prod.stock_qty += item.qty; await updateItem('products', prod); }
+      }
     }
-
-    // Analytics
-    function renderAnalytics() {
-        const revenue = sales.reduce((a, b) => a + (b.totalAmount || 0), 0);
-        const cost = products.reduce((sum, p) => sum + ((p.buying_price || 0) * (p.initialStock ? 0 : 0)), 0); // simplified gross profit demo
-        const expenseTotal = expenses.reduce((a, b) => a + b.amount, 0);
-        const grossProfit = revenue * 0.3;
-        return `<div class="card"><div class="card-header">📊 Financial Summary</div><div class="grid-2"><div>💰 Total Revenue: ${formatMoney(revenue)}</div><div>📉 Expenses: ${formatMoney(expenseTotal)}</div><div>📈 Est. Gross Profit: ${formatMoney(grossProfit)}</div><div>🧾 Invoices: ${invoices.length}</div></div></div>`;
+    // revert customer balance if credit sale
+    if(sale.customerName) {
+      let cust = customers.find(c=>c.name.toLowerCase()===sale.customerName.toLowerCase());
+      if(cust) {
+        if(sale.method === 'credit') { cust.credit -= sale.amount; cust.balance = cust.credit - cust.debit; await updateItem('customers', cust); }
+        cust.totalSpent = Math.max(0, (cust.totalSpent||0) - sale.amount);
+        await updateItem('customers', cust);
+        // remove related transaction
+        let relatedTxn = customerTxns.find(t=>t.customerId===cust.id && t.amount===sale.amount && t.note?.includes(sale.product));
+        if(relatedTxn) await deleteItem('customerTransactions', relatedTxn.id);
+      }
     }
+    // delete associated invoice
+    let inv = invoices.find(i=>i.saleId === saleId);
+    if(inv) { await deleteItem('invoices', inv.id); invoices = invoices.filter(i=>i.id!==inv.id); }
+    await deleteItem('sales', saleId);
+    await loadData();
+    renderContent();
+    showToast('Sale and invoice deleted successfully');
+  };
 
-    // Global helpers & init
-    window.switchModule = switchModule;
-    document.getElementById('menuToggle')?.addEventListener('click', () => document.getElementById('sidebar').classList.toggle('mobile-open'));
+  // Products delete with stock safety
+  window.deleteProd = async (id) => { if(confirm('Delete product? This will not affect past sales.')){ await deleteItem('products',id); await loadData(); renderProductList(); } };
+  // Expenses delete
+  window.deleteExpenseItem = async (id) => { if(confirm('Delete expense?')){ await deleteItem('expenses',id); await loadData(); renderExpenseList(); } };
+  // Customer delete with cascade
+  window.deleteCustomer = async (id) => {
+    if(!confirm('⚠️ Delete this customer? All their transactions and associated sales will also be removed (cannot undo).')) return;
+    let cust = customers.find(c=>c.id===id);
+    if(!cust) return;
+    // delete all customer transactions
+    let txns = customerTxns.filter(t=>t.customerId===id);
+    for(let t of txns) await deleteItem('customerTransactions', t.id);
+    // delete all sales for this customer and revert stock
+    let custSales = sales.filter(s=>s.customerName?.toLowerCase()===cust.name.toLowerCase());
+    for(let sale of custSales) {
+      if(sale.items) for(let item of sale.items) {
+        let prod = products.find(p=>p.name===item.name);
+        if(prod) { prod.stock_qty += item.qty; await updateItem('products', prod); }
+      }
+      let inv = invoices.find(i=>i.saleId===sale.id);
+      if(inv) await deleteItem('invoices', inv.id);
+      await deleteItem('sales', sale.id);
+    }
+    await deleteItem('customers', id);
+    await loadData();
+    renderContent();
+    showToast(`Customer ${cust.name} deleted with all records`);
+  };
+  // Invoice delete
+  window.deleteInvoice = async (id) => {
+    if(confirm('Delete invoice? This does NOT affect sales or stock.')){
+      await deleteItem('invoices', id);
+      await loadData();
+      renderInvoiceList();
+      showToast('Invoice deleted');
+    }
+  };
 
-    (async function init() {
-        await openDatabase();
-        await loadAllData();
-        await seedInitialData();
-        buildNavigation();
-        switchModule('dashboard');
-    })();
+  // Products UI
+  function renderProducts() { return `<div class="card"><div class="flex-between"><h3>📦 Inventory</h3><button class="btn btn-primary" onclick="openAddProduct()">+ Add Product</button></div><div id="productList"></div></div>`; }
+  function renderProductList() { let list=document.getElementById('productList'); if(!list)return; list.innerHTML=products.map(p=>`<div class="flex-between" style="padding:12px 0;border-bottom:1px solid var(--border)"><div><b>${p.name}</b> (${p.unit})<br>Stock: ${p.stock_qty} | Sell: ${fmt(p.selling_price)}</div><div><button class="btn" onclick="restockProd(${p.id})">Restock</button><button class="btn btn-danger" onclick="deleteProd(${p.id})">Delete</button></div></div>`).join(''); }
+  window.openAddProduct = () => { openModal(`<h3>New Product</h3><input id="prodName" placeholder="Name" class="btn" style="width:100%;margin:8px 0"><input id="prodUnit" placeholder="Unit" class="btn" style="width:100%"><input id="prodStock" type="number" placeholder="Stock" class="btn"><input id="prodBuy" type="number" placeholder="Buy Price" class="btn"><input id="prodSell" type="number" placeholder="Sell Price" class="btn"><button class="btn btn-primary" onclick="saveProduct()">Save</button>`); };
+  window.saveProduct = async () => { let name=document.getElementById('prodName')?.value, unit=document.getElementById('prodUnit')?.value, stock=parseFloat(document.getElementById('prodStock')?.value), buy=parseFloat(document.getElementById('prodBuy')?.value), sell=parseFloat(document.getElementById('prodSell')?.value); if(name){ await addItem('products',{name,unit,stock_qty:stock,buying_price:buy,selling_price:sell,low_threshold:Math.max(5,stock*0.1)}); await loadData(); renderProductList(); closeModal(); } };
+  window.restockProd = async (id) => { let p=products.find(p=>p.id===id); if(!p) return; let add=parseFloat(prompt(`Add stock to ${p.name}:`)); if(add>0){ p.stock_qty+=add; await updateItem('products',p); await loadData(); renderProductList(); } };
+
+  // Customers with delete
+  function renderCustomers() { return `<div class="card"><div class="flex-between"><h3>👥 Clients</h3><button class="btn btn-primary" onclick="openAddCustomer()">+ Add Client</button></div><input id="custSearch" placeholder="Search name or phone..." style="margin:16px 0;padding:12px;background:var(--surface);border-radius:40px;border:1px solid var(--border);width:100%"><div id="customersList"></div></div>`; }
+  function attachCustomerSearch() { let inp = document.getElementById('custSearch'); if(inp) inp.addEventListener('input', () => renderCustomerList()); }
+  function renderCustomerList() { let listDiv=document.getElementById('customersList'); if(!listDiv) return; let search=document.getElementById('custSearch')?.value.toLowerCase()||''; let filtered=customers.filter(c=>c.name.toLowerCase().includes(search)||(c.phone||'').includes(search)); listDiv.innerHTML=filtered.map(c=>`<div class="flex-between" style="padding:12px 0;border-bottom:1px solid var(--border)"><div><b>${c.name}</b><br>${c.phone||'—'} | Balance: ${fmt(c.balance||0)}</div><div><button class="btn" onclick="viewCustomerTxns(${c.id})">History</button><button class="btn btn-emerald" onclick="recordPaymentPrompt(${c.id})">Pay</button><button class="btn btn-danger" onclick="deleteCustomer(${c.id})">Delete</button></div></div>`).join(''); }
+  window.openAddCustomer = () => { openModal(`<h3>Add Client</h3><input id="custName" placeholder="Full name" class="btn" style="width:100%;margin:8px 0"><input id="custPhone" placeholder="Phone" class="btn"><button class="btn btn-primary" onclick="saveCustomer()">Save</button>`); };
+  window.saveCustomer = async () => { let name=document.getElementById('custName')?.value.trim(), phone=document.getElementById('custPhone')?.value.trim(); if(!name) return; await addItem('customers',{name,phone,totalSpent:0,credit:0,debit:0,balance:0}); await loadData(); renderCustomerList(); closeModal(); };
+  window.recordPaymentPrompt = (id) => { let cust=customers.find(c=>c.id===id); openModal(`<h3>Payment - ${cust.name}</h3><div>Balance: ${fmt(cust.balance||0)}</div><input id="payAmount" type="number" placeholder="Amount" class="btn" style="width:100%;margin:12px 0"><button class="btn btn-emerald" onclick="recordPayment(${id})">Submit</button>`); };
+  window.recordPayment = async (id) => { let amt=parseFloat(document.getElementById('payAmount')?.value); if(!amt||amt<=0) return; let cust=customers.find(c=>c.id===id); let actual=Math.min(amt, cust.balance||0); if(actual<=0) return showToast('No debt',true); cust.debit=(cust.debit||0)+actual; cust.balance=(cust.credit||0)-cust.debit; await updateItem('customers',cust); await addItem('customerTransactions',{customerId:id,type:'debit',amount:actual,note:'Payment received',date:new Date().toISOString()}); await loadData(); renderCustomerList(); closeModal(); showToast(`Payment of ${fmt(actual)} recorded`); };
+  window.viewCustomerTxns = (id) => { let txns=customerTxns.filter(t=>t.customerId===id).sort((a,b)=>new Date(b.date)-new Date(a.date)); openModal(`<h3>Transaction History</h3>${txns.map(t=>`<div class="flex-between" style="padding:8px 0"><span>${new Date(t.date).toLocaleDateString()} ${t.note||''}</span><span style="color:${t.type==='credit'?'#E54562':'var(--emerald)'}">${t.type==='credit'?'+':'-'} ${fmt(t.amount)}</span></div>`).join('')||'No transactions'}`); };
+
+  // Invoices with delete
+  function renderInvoices() { return `<div class="card"><h3>🧾 Invoices</h3><div id="invoiceHistory"></div></div>`; }
+  function renderInvoiceList() { let listDiv=document.getElementById('invoiceHistory'); if(!listDiv)return; listDiv.innerHTML=invoices.slice().reverse().map(inv=>`<div class="flex-between" style="padding:12px 0;border-bottom:1px solid var(--border)"><div><b>${inv.number}</b><br>${inv.customerName} | ${fmt(inv.total)}</div><div><button class="btn" onclick="viewInvoiceModal(${inv.id})">View</button><button class="btn btn-danger" onclick="deleteInvoice(${inv.id})">Delete</button></div></div>`).join(''); }
+  window.viewInvoiceModal = (id) => { let inv=invoices.find(i=>i.id===id); if(inv) openModal(renderInvoiceHTML(inv)+`<div class="flex-between" style="margin-top:16px"><button class="btn btn-primary" onclick="printInvoice(${id})">Print</button><button class="btn" onclick="downloadInvoicePDF(${id})">PDF</button></div>`); };
+
+  // Expenses
+  function renderExpenses() { return `<div class="card"><div class="flex-between"><h3>💸 Expenses</h3><button class="btn btn-primary" onclick="openAddExpense()">+ Add</button></div><div id="expensesList"></div></div>`; }
+  function renderExpenseList() { let list=document.getElementById('expensesList'); if(!list)return; list.innerHTML=expenses.map(e=>`<div class="flex-between" style="padding:10px 0;border-bottom:1px solid var(--border)"><span>${e.title}</span><span>${fmt(e.amount)}</span><button class="btn btn-danger" onclick="deleteExpenseItem(${e.id})">Delete</button></div>`).join(''); }
+  window.openAddExpense = () => { openModal(`<h3>Add Expense</h3><input id="expTitle" placeholder="Title" class="btn" style="width:100%;margin:8px 0"><input id="expAmount" type="number" placeholder="Amount" class="btn"><button class="btn btn-primary" onclick="saveExpense()">Save</button>`); };
+  window.saveExpense = async () => { let title=document.getElementById('expTitle')?.value, amt=parseFloat(document.getElementById('expAmount')?.value); if(title&&amt){ await addItem('expenses',{title,amount:amt,date:new Date().toISOString()}); await loadData(); renderExpenseList(); closeModal(); } };
+
+  // Analytics
+  function renderAnalytics() { return `<div class="card"><h3>📊 Sales Analytics (Last 30 Days)</h3><canvas id="analyticsChart" height="200"></canvas><div id="insights"></div></div>`; }
+  function drawAnalyticsChart() {
+    let canvas = document.getElementById('analyticsChart');
+    if(!canvas) return;
+    if(analyticsChart) analyticsChart.destroy();
+    let last30 = Array(30).fill(0);
+    sales.forEach(s=>{ let diff=Math.floor((new Date()-new Date(s.date))/86400000); if(diff<30) last30[29-diff]+=s.amount; });
+    let ctx = canvas.getContext('2d');
+    analyticsChart = new Chart(ctx,{type:'bar',data:{labels:Array(30).fill().map((_,i)=>`Day ${i+1}`),datasets:[{label:'Sales (KES)',data:last30,backgroundColor:'#C8883A'}]}});
+    document.getElementById('insights').innerHTML = `<div class="stat-card"><div>📈 Peak Day: ${fmt(Math.max(...last30))}</div><div>💰 Total: ${fmt(sales.reduce((a,b)=>a+b.amount,0))}</div></div>`;
+  }
+
+  async function renderApp() { buildNav(); await loadData(); renderContent(); }
+
+  // INIT
+  (async function init() {
+    let sess = getSession();
+    if(sess) {
+      try {
+        currentUser = { id:sess.userId, email:sess.email, shopName:sess.shopName };
+        await openUserDB(sess.userId);
+        await loadData();
+        await seedData();
+        document.getElementById('app').style.display = 'flex';
+        await renderApp();
+      } catch(e) { console.error(e); logout(); }
+    } else {
+      document.getElementById('app').style.display = 'none';
+      let authHtml = `<div style="position:fixed;inset:0;background:#050B08;display:flex;align-items:center;justify-content:center;z-index:200"><div class="card" style="max-width:380px;width:90%;text-align:center"><div style="font-family:var(--font-serif);font-size:36px">Smart <em style="color:var(--gold)">Duka</em></div><input id="authEmail" placeholder="Email" class="btn" style="width:100%;margin:16px 0;background:rgba(255,255,255,0.05)"><input id="authPass" type="password" placeholder="Password" class="btn" style="width:100%"><input id="authShop" placeholder="Shop Name (signup)" class="btn" style="width:100%;margin:12px 0;display:none"><div class="flex-between" style="gap:12px;margin-top:16px"><button id="authLoginBtn" class="btn btn-primary" style="flex:1">Login</button><button id="authSignupBtn" class="btn" style="flex:1">Sign Up</button></div></div></div>`;
+      document.body.insertAdjacentHTML('beforeend', authHtml);
+      let loginBtn = document.getElementById('authLoginBtn'), signupBtn = document.getElementById('authSignupBtn');
+      let shopField = document.getElementById('authShop');
+      loginBtn.onclick = async () => { let email=document.getElementById('authEmail').value, pwd=document.getElementById('authPass').value; try{ await login(email,pwd); location.reload(); }catch(e){ alert(e.message); } };
+      signupBtn.onclick = async () => { let email=document.getElementById('authEmail').value, pwd=document.getElementById('authPass').value, shop=shopField.value; if(!shop) { shopField.style.display='block'; shopField.focus(); return; } try{ await signup(shop,email,pwd); location.reload(); }catch(e){ alert(e.message); } };
+    }
+  })();
 </script>
 </body>
 </html>
